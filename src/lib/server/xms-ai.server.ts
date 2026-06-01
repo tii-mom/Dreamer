@@ -1,4 +1,8 @@
 import type { BirthProfile, ChatMsg, DailyState, UserProfile } from "../domain";
+import { getEquippedInscriptions } from "./xms-blindbox.server";
+import { resolveDrawResultInfo } from "./xms-blindbox-draw.server";
+import { getUserAssets } from "./xms-blindbox.server";
+import { ASSET_CATALOG } from "../assets/asset-catalog";
 
 type GenerateReplyInput = {
   env: CloudflareBindings;
@@ -53,6 +57,31 @@ function compactHistory(messages: ChatMsg[]) {
     }));
 }
 
+async function getInscriptionPrompt(env: CloudflareBindings, userId: string): Promise<string> {
+  try {
+    const equipped = await getEquippedInscriptions(env, userId);
+    if (!equipped || equipped.length === 0) return "";
+
+    const assets = await getUserAssets(env, userId);
+    const lines: string[] = [];
+
+    for (const eq of equipped) {
+      const assetId = eq.asset_id ?? eq.assetId;
+      const asset = assets.find((a) => a.id === assetId);
+      if (!asset) continue;
+      const catalogEntry = ASSET_CATALOG.find((c) => c.assetCode === asset.assetCode);
+      if (!catalogEntry) continue;
+
+      lines.push(`- ${catalogEntry.name}（已装配）：${catalogEntry.effectDescription}`);
+    }
+
+    if (lines.length === 0) return "";
+    return `\n用户当前装配铭文效果：\n${lines.join("\n")}\n`;
+  } catch {
+    return "";
+  }
+}
+
 export async function generateMasterReply(input: GenerateReplyInput) {
   const model = input.env.DEEPSEEK_CHAT_MODEL || "deepseek-v4-flash";
   const accountId = input.env.CF_ACCOUNT_ID;
@@ -73,6 +102,9 @@ export async function generateMasterReply(input: GenerateReplyInput) {
     : "用户尚未完整提交出生资料。";
   const dailyLine = `今日流日：${input.daily.fortune.title}；吉时 ${input.daily.fortune.luckyHour}；财神方位 ${input.daily.fortune.direction}；忌 ${input.daily.fortune.avoid}。`;
 
+  // Load equipped inscription context
+  const inscriptionLine = await getInscriptionPrompt(input.env, input.user.id);
+
   try {
     const response = await fetch(
       `https://gateway.ai.cloudflare.com/v1/${accountId}/${gatewayId}/deepseek/chat/completions`,
@@ -92,7 +124,7 @@ export async function generateMasterReply(input: GenerateReplyInput) {
             { role: "system", content: SYSTEM_PROMPT },
             {
               role: "system",
-              content: `${profileLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。`,
+              content: `${profileLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。${inscriptionLine}`,
             },
             ...compactHistory(input.history),
             { role: "user", content: input.userText },

@@ -8,6 +8,7 @@ import {
   nowIso,
   markPaymentEntitlementApplied,
 } from "./xms-store.server";
+import { executeBlindboxDraw } from "./xms-blindbox-draw.server";
 
 type PaymentRow = PaymentRecord & {
   entitlement_applied?: number;
@@ -113,89 +114,13 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
 
     case "blindbox_single":
     case "blindbox_ten": {
-      // Perform draw in memory or D1 and grant assets
-      const drawsCount = payment.productCode === "blindbox_ten" ? 10 : 1;
-      const results: Array<{ assetCode: string; rarity: string; assetType: string }> = [];
-
-      for (let i = 0; i < drawsCount; i++) {
-        const roll = Math.random() * 100;
-        let rarity = "normal";
-        let assetCode = "";
-        const assetType = "inscription";
-
-        if (roll < 5) {
-          rarity = "legendary";
-          assetCode = "tianji_rune";
-        } else if (roll < 20) {
-          rarity = "epic";
-          assetCode = "wuxu_rune";
-        } else if (roll < 50) {
-          rarity = "rare";
-          assetCode = "caibo_rune";
-        } else {
-          rarity = "normal";
-          assetCode = "taohua_rune";
-        }
-
-        results.push({ assetCode, rarity, assetType });
-
-        if (!db) {
-          const assetId = `ast_${crypto.randomUUID().slice(0, 8)}`;
-          devStore().userAssets.set(assetId, {
-            id: assetId,
-            userId: user.id,
-            assetType,
-            assetCode,
-            rarity,
-            quantity: 1,
-            level: 1,
-            locked: 0,
-          });
-        } else {
-          await db
-            .prepare(
-              `INSERT INTO user_assets 
-              (id, user_id, asset_type, asset_code, rarity) 
-              VALUES (?, ?, ?, ?, ?)`,
-            )
-            .bind(`ast_${crypto.randomUUID().slice(0, 8)}`, user.id, assetType, assetCode, rarity)
-            .run();
-        }
-      }
-
-      // Record blindbox draws
-      if (!db) {
-        devStore().blindboxDraws.set(payment.orderId, {
-          id: `drw_${crypto.randomUUID().slice(0, 8)}`,
-          userId: user.id,
-          paymentId: payment.id,
-          boxType: payment.productCode,
-          drawCount: drawsCount,
-          probabilityVersion: "v1.0",
-          resultJson: JSON.stringify(results),
-          referralCode: payment.referralCode || null,
-          operatorUserId: payment.operatorUserId || null,
-        });
-      } else {
-        await db
-          .prepare(
-            `INSERT INTO blindbox_draws
-            (id, user_id, payment_id, box_type, draw_count, probability_version, result_json, referral_code, operator_user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          )
-          .bind(
-            `drw_${crypto.randomUUID().slice(0, 8)}`,
-            user.id,
-            payment.id,
-            payment.productCode,
-            drawsCount,
-            "v1.0",
-            JSON.stringify(results),
-            payment.referralCode || null,
-            payment.operatorUserId || null,
-          )
-          .run();
-      }
+      await executeBlindboxDraw(env, {
+        userId: user.id,
+        paymentId: payment.id,
+        boxType: payment.productCode as "blindbox_single" | "blindbox_ten",
+        referralCode: payment.referralCode ?? null,
+        operatorUserId: payment.operatorUserId ?? null,
+      });
       break;
     }
   }
