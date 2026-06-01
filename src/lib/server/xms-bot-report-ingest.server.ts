@@ -1,11 +1,25 @@
-import { createWechatBinding, getBindingByProviderUser, verifyBridgeSignature } from "./xms-wechat.server";
-import { createUser, getBirthProfile, getUser, nowIso } from "./xms-store.server";
-import { getOrCreateUserChart } from "./xms-chart.server";
 import { createBotHtmlReportReply } from "./xms-bot-report.server";
+import { getOrCreateUserChart } from "./xms-chart.server";
+import { createUser, getBirthProfile, getUser, nowIso } from "./xms-store.server";
+import {
+  createWechatBinding,
+  getBindingByProviderUser,
+  verifyBridgeSignature,
+} from "./xms-wechat.server";
 
 export function wantsLongReport(text: string) {
   const lower = text.toLowerCase();
-  const keys = ["report", "full", "detail", "html", "\u8be6\u7ec6", "\u5b8c\u6574", "\u62a5\u544a", "\u89e3\u5c01", "\u5377\u5b97"];
+  const keys = [
+    "report",
+    "full",
+    "detail",
+    "html",
+    "\u8be6\u7ec6",
+    "\u5b8c\u6574",
+    "\u62a5\u544a",
+    "\u89e3\u5c01",
+    "\u5377\u5b97",
+  ];
   return keys.some((key) => lower.includes(key));
 }
 
@@ -21,6 +35,7 @@ export async function maybeClawbotReportIngestHandler(
   env: CloudflareBindings,
 ): Promise<Response | null> {
   if (request.method !== "POST") return null;
+
   const bodyText = await request.clone().text();
   let body: ClawbotIngestBody;
   try {
@@ -28,8 +43,10 @@ export async function maybeClawbotReportIngestHandler(
   } catch {
     return null;
   }
+
   if (body.provider !== "clawbot" || !body.providerUserId || !body.content) return null;
   if (!wantsLongReport(body.content)) return null;
+
   if (!verifyBridgeSignature(request, env, bodyText)) {
     return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
       status: 401,
@@ -39,8 +56,12 @@ export async function maybeClawbotReportIngestHandler(
 
   let binding = await getBindingByProviderUser(env, "clawbot", body.providerUserId);
   let user = binding ? await getUser(env, binding.userId) : null;
+
   if (!binding || !user) {
-    user = await createUser(env, { nickname: `wx_${body.providerUserId.slice(-4)}`, source: "clawbot" });
+    user = await createUser(env, {
+      nickname: `wx_${body.providerUserId.slice(-4)}`,
+      source: "clawbot",
+    });
     binding = {
       id: `bin_${crypto.randomUUID().slice(0, 8)}`,
       userId: user.id,
@@ -66,6 +87,7 @@ export async function maybeClawbotReportIngestHandler(
     context,
     scene: "fortune-report",
   });
+
   return new Response(JSON.stringify({ ok: true, reply }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
