@@ -59,9 +59,14 @@ function BindWechat() {
     }
   }, []);
 
+  const [created, setCreated] = useState(false);
+
   useEffect(() => {
+    if (!bootstrapQuery.data?.user?.id) return;
+    if (created) return;
+    setCreated(true);
     createTicket();
-  }, [createTicket]);
+  }, [bootstrapQuery.data?.user?.id, createTicket, created]);
 
   useEffect(() => {
     if (!bindTicket) return;

@@ -19,8 +19,16 @@ export const createClawbotBindTicket = createServerFn({ method: "POST" })
     const token = getCookie(SESSION_COOKIE) || undefined;
     const user = token ? await getUserBySession(env, token) : null;
 
+    let operatorUserId: string | null = null;
+    if (data.referralCode) {
+      const { getOperatorByReferralCode } = await import("../server/xms-operator.server");
+      const operator = await getOperatorByReferralCode(env, data.referralCode);
+      operatorUserId = operator?.userId ?? null;
+    }
+
     const ticket = await createBindTicket(env, {
       userId: user?.id ?? null,
+      operatorUserId,
       scene: data.scene || "bind",
       referralCode: data.referralCode,
       masterAssetId: data.masterAssetId,

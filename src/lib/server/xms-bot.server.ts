@@ -119,6 +119,12 @@ export async function handleBotMessage(
     // Look up the user (may have been created during bind, or pre-existing)
     const binding = await getBindingByProviderUser(env, "clawbot", providerUserId);
     const user = binding ? await getUser(env, binding.userId) : null;
+
+    if (!bindResult.ok && !user) {
+      // No real user and bind failed — return error without writing bot messages
+      return bindResult.reason || "绑定码无效或已过期，请回到网页重新生成。";
+    }
+
     const userId = user?.id || bindResult.userId || "unknown";
     const bindingId = binding?.id || bindResult.bindingId || "unknown";
 
