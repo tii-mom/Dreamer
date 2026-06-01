@@ -2,6 +2,7 @@ import { sidebarItems } from "@/lib/mock-data";
 import type { ModalKey } from "@/lib/types";
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ChevronDown,
   Coins,
@@ -220,7 +221,7 @@ export function Sidebar({
           })}
         </nav>
 
-        <div className="p-3 border-t border-gold/15 shrink-0">
+        <div className="p-3 border-t border-gold/15 shrink-0 space-y-3">
           <div className="rounded-xl p-3 talisman-border bg-card/60">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">气运值</span>
@@ -232,6 +233,24 @@ export function Sidebar({
             <p className="mt-2 text-[10px] text-muted-foreground">
               距下一品阶 · 人玑 还差 720 气运
             </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-[10px] text-muted-foreground/60">
+            <Link to="/terms" className="hover:text-gold hover:underline">
+              用户协议
+            </Link>
+            <span>·</span>
+            <Link to="/privacy" className="hover:text-gold hover:underline">
+              隐私政策
+            </Link>
+            <span>·</span>
+            <Link to="/refund" className="hover:text-gold hover:underline">
+              退款规则
+            </Link>
+            <span>·</span>
+            <Link to="/disclaimer" className="hover:text-gold hover:underline">
+              免责声明
+            </Link>
           </div>
         </div>
       </aside>

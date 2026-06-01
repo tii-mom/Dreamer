@@ -14,6 +14,8 @@ import {
   restoreSessionByCode,
   saveBirthProfile as saveBirthProfileService,
   sessionCookieOptions,
+  createPaymentOrderService,
+  queryPaymentStatusService,
 } from "../server/xms-service.server";
 
 function writeSessionCookie(token: string) {
@@ -106,3 +108,30 @@ export const getRuntimeHealth = createServerFn({ method: "GET" }).handler(async 
     hasDeepSeek: Boolean(env.DEEPSEEK_API_KEY && env.CF_ACCOUNT_ID && env.CF_AI_GATEWAY_ID),
   };
 });
+
+export const createPaymentOrder = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      productCode: z.enum([
+        "seal_unlock",
+        "monthly_sub",
+        "monthly_sub_30d",
+        "shop_contract",
+        "operator_899",
+        "blindbox_single",
+        "blindbox_ten",
+        "qiyun_topup",
+      ]),
+      payType: z.enum(["alipay", "wechat"]),
+      amountCents: z.number().int().positive().optional(),
+    }),
+  )
+  .handler(async ({ context, data }) => {
+    return createPaymentOrderService(context, token(), data);
+  });
+
+export const queryPaymentStatus = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ orderId: z.string().min(1) }))
+  .handler(async ({ context, data }) => {
+    return queryPaymentStatusService(context, token(), data);
+  });

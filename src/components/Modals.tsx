@@ -5,6 +5,8 @@ import { blindboxRates, marketItems, orderMock } from "@/lib/mock-data";
 import type { ModalKey } from "@/lib/types";
 import type { EarnApplication, ShareAsset } from "@/lib/domain";
 import { MasterAvatar } from "./MasterAvatar";
+import { AssetImage } from "./assets/AssetImage";
+import type { AssetVariant } from "@/lib/assets/asset-types";
 import {
   Sparkles,
   TrendingUp,
@@ -211,7 +213,12 @@ export function BoxModal({ open, onClose }: { open: boolean; onClose: () => void
           <div className="relative h-56 grid place-items-center rounded-2xl scroll-card overflow-hidden mb-4">
             <div className="absolute inset-0 rune-pattern opacity-60" />
             <div className="relative animate-breath">
-              <div className="text-7xl">🎴</div>
+              <AssetImage
+                assetId="blind_box.box.standard"
+                variant="box"
+                alt="戏命师盲盒"
+                className="h-36 w-36 object-contain"
+              />
             </div>
           </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
@@ -242,22 +249,7 @@ export function BoxModal({ open, onClose }: { open: boolean; onClose: () => void
           </div>
         </>
       )}
-      {phase === "spin" && (
-        <div className="h-72 grid place-items-center relative">
-          <motion.div
-            animate={{ rotate: 720 }}
-            transition={{ duration: 2.2, ease: [0.4, 0, 0.2, 1] }}
-            className="relative h-44 w-44 rounded-full border-4 border-dashed border-gold/70 glow-gold grid place-items-center"
-          >
-            <div className="absolute inset-4 rounded-full border-2 border-primary/60" />
-            <div className="absolute inset-8 rounded-full border border-accent/60" />
-            <span className="text-5xl">🧭</span>
-          </motion.div>
-          <div className="absolute bottom-4 text-xs text-muted-foreground animate-pulse">
-            天机推演中……符纸已焚
-          </div>
-        </div>
-      )}
+      {phase === "spin" && <OpeningSequence />}
       {phase === "result" && (
         <motion.div
           initial={{ scale: 0.6, opacity: 0 }}
@@ -265,19 +257,36 @@ export function BoxModal({ open, onClose }: { open: boolean; onClose: () => void
           className="text-center py-2"
         >
           <div
-            className="mx-auto w-56 rounded-2xl p-5 scroll-card relative"
+            className="mx-auto w-64 rounded-2xl p-5 scroll-card relative overflow-hidden"
             style={{ borderColor: "var(--rare-purple)" }}
           >
+            <AssetImage
+              assetId="blind_box.result.dixuan"
+              variant="mobile"
+              alt="地璇抽中结果背景"
+              priority
+              className="absolute inset-0 h-full w-full object-cover opacity-30"
+            />
             <span
               className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-display"
               style={{ background: "var(--rare-purple)", color: "white" }}
             >
               紫色史诗 · 地璇
             </span>
-            <MasterAvatar size={160} />
-            <h4 className="mt-2 font-display text-xl text-gold-gradient">地璇命师 · 合婚画司</h4>
-            <p className="text-[11px] text-muted-foreground mt-1">专精：合婚 · 风水择日</p>
-            <div className="mt-3 text-xs text-bone">
+            <AssetImage
+              assetId="master.dixuan.01"
+              variant="card"
+              priority
+              alt="地璇命师 · 合婚画司"
+              className="relative z-10 mx-auto w-36 rounded-xl border border-gold/25 object-cover shadow-2xl"
+            />
+            <h4 className="relative z-10 mt-2 font-display text-xl text-gold-gradient">
+              地璇命师 · 合婚画司
+            </h4>
+            <p className="relative z-10 text-[11px] text-muted-foreground mt-1">
+              专精：合婚 · 风水择日
+            </p>
+            <div className="relative z-10 mt-3 text-xs text-bone">
               参考价 <span className="text-gold font-display">¥1,288</span>
             </div>
           </div>
@@ -293,6 +302,48 @@ export function BoxModal({ open, onClose }: { open: boolean; onClose: () => void
         </motion.div>
       )}
     </Modal>
+  );
+}
+
+function OpeningSequence() {
+  const frames = [
+    "blind_box.frame.01",
+    "blind_box.frame.02",
+    "blind_box.frame.03",
+    "blind_box.frame.04",
+    "blind_box.frame.05",
+    "blind_box.frame.06",
+  ];
+
+  return (
+    <div className="h-72 grid place-items-center relative">
+      <motion.div
+        animate={{ rotate: 720 }}
+        transition={{ duration: 2.2, ease: [0.4, 0, 0.2, 1] }}
+        className="relative h-48 w-48 rounded-full border-4 border-dashed border-gold/70 glow-gold grid place-items-center overflow-hidden"
+      >
+        {frames.map((assetId, index) => (
+          <motion.div
+            key={assetId}
+            className="absolute inset-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ delay: index * 0.32, duration: 0.48, repeat: 0 }}
+          >
+            <AssetImage
+              assetId={assetId}
+              variant="frame"
+              alt={`开盒序列帧 ${index + 1}`}
+              className="h-full w-full rounded-full object-cover"
+            />
+          </motion.div>
+        ))}
+        <div className="absolute inset-8 rounded-full border border-accent/60" />
+      </motion.div>
+      <div className="absolute bottom-4 text-xs text-muted-foreground animate-pulse">
+        天机推演中……符纸已焚
+      </div>
+    </div>
   );
 }
 
@@ -337,12 +388,17 @@ export function MarketDrawer({ open, onClose }: { open: boolean; onClose: () => 
           {list.map((m) => (
             <div key={m.id} className="scroll-card rounded-xl p-3 flex items-center gap-3">
               <div
-                className="h-14 w-14 rounded-xl grid place-items-center text-2xl shrink-0"
+                className="h-14 w-14 rounded-xl grid place-items-center shrink-0 overflow-hidden"
                 style={{
                   background: `linear-gradient(135deg, var(--color-${m.color}) 0%, oklch(0.2 0.05 295) 100%)`,
                 }}
               >
-                {m.kind === "master" ? "🎭" : "📜"}
+                <AssetImage
+                  assetId={m.assetId}
+                  variant={m.thumbVariant as AssetVariant}
+                  alt={m.name}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -407,28 +463,28 @@ export function EarnDrawer({
   isApplying: boolean;
   application: EarnApplication | null;
 }) {
-  const [offer, setOffer] = useState("八字事业问事 + 今日行动建议");
-  const [audience, setAudience] = useState("朋友圈里焦虑工作、感情和副业的人");
-  const [priceRange, setPriceRange] = useState("30-99");
+  const [offer, setOffer] = useState("测算方案设计：事业发展与决策报告");
+  const [audience, setAudience] = useState("适合面临职业转型与项目决策的求测者");
+  const [priceRange, setPriceRange] = useState("30-99 (建议点数)");
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title="戏命出马 · 我的算命铺子"
-      subtitle="你当掌柜，戏命师替你打工。首版为模拟预览，不真实收款。"
+      title="戏命出马 · 咨询菜单设计"
+      subtitle="由戏命师为你生成专属的命理咨询服务菜单与报告草稿。"
       side="right"
     >
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <Kpi label="今日订单" value="12" />
-        <Kpi label="今日收入" value="¥504" accent />
-        <Kpi label="Token 成本" value="¥18" />
-        <Kpi label="净利润" value="¥486" accent />
-        <Kpi label="转化率" value="38%" />
-        <Kpi label="客户评分" value="4.9★" />
+        <Kpi label="今日咨询案例" value="12 份" />
+        <Kpi label="预计生成报告" value="12 份" accent />
+        <Kpi label="模型消耗" value="18k tokens" />
+        <Kpi label="服务匹配度" value="98%" accent />
+        <Kpi label="专业匹配" value="88%" />
+        <Kpi label="生成质量" value="4.9★" />
       </div>
 
       <div className="rounded-xl glass p-3 mb-4">
-        <div className="text-xs text-muted-foreground mb-2">本周收益曲线</div>
+        <div className="text-xs text-muted-foreground mb-2">本周报告生成趋势</div>
         <div className="flex items-end gap-1.5 h-20">
           {[40, 65, 50, 80, 90, 70, 95].map((h, i) => (
             <div
@@ -445,7 +501,7 @@ export function EarnDrawer({
         </div>
       </div>
 
-      <h4 className="text-xs font-semibold text-gold mb-2">实时订单</h4>
+      <h4 className="text-xs font-semibold text-gold mb-2">近期生成记录</h4>
       <div className="space-y-2 mb-4">
         {orderMock.map((o) => (
           <div
@@ -459,10 +515,10 @@ export function EarnDrawer({
               <div className="text-sm text-bone">
                 {o.name} · {o.type}
               </div>
-              <div className="text-[11px] text-muted-foreground">订单号 #{1000 + o.id}</div>
+              <div className="text-[11px] text-muted-foreground">报告号 #{1000 + o.id}</div>
             </div>
             <div className="text-right">
-              <div className="font-display text-gold">¥{o.price}</div>
+              <div className="font-display text-gold">{o.price} 点</div>
               <div
                 className={`text-[10px] ${o.status === "已完成" ? "text-emerald-400" : o.status === "生成中" ? "text-accent" : "text-destructive"}`}
               >
@@ -474,10 +530,10 @@ export function EarnDrawer({
       </div>
 
       <div className="rounded-xl glass p-3 mb-4">
-        <div className="text-xs font-semibold text-gold mb-2">出马资格申请</div>
+        <div className="text-xs font-semibold text-gold mb-2">服务菜单参数设计</div>
         {application ? (
           <p className="text-xs text-bone leading-relaxed">
-            已进入候补：{application.offer} · {application.audience} · 建议客单 ¥
+            方案已就绪：{application.offer} · {application.audience} · 建议点数：
             {application.priceRange}
           </p>
         ) : (
@@ -507,10 +563,10 @@ export function EarnDrawer({
           disabled={isApplying || Boolean(application)}
           className="h-10 rounded-xl ritual-btn text-xs disabled:opacity-60"
         >
-          {application ? "已排队" : isApplying ? "入簿中" : "申请出马资格"}
+          {application ? "方案已就绪" : isApplying ? "推演中" : "生成菜单与报告方案"}
         </button>
         <button className="h-10 rounded-xl bg-secondary/70 border border-gold/30 text-gold text-xs">
-          生成朋友圈广告
+          生成咨询海报
         </button>
         <button className="h-10 rounded-xl bg-secondary/70 border border-gold/20 text-bone text-xs">
           设置服务价格
@@ -559,7 +615,13 @@ export function ShareModal({
       size="md"
     >
       <div className="mx-auto w-full max-w-[20rem] aspect-[3/4] rounded-2xl scroll-card relative overflow-hidden p-5 flex flex-col">
-        <div className="absolute inset-0 rune-pattern opacity-40" />
+        <AssetImage
+          assetId="share.seal"
+          variant="mobile"
+          alt="命盘分享卡背景"
+          className="absolute inset-0 h-full w-full object-cover opacity-35"
+        />
+        <div className="absolute inset-0 rune-pattern opacity-30" />
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-primary/30 blur-3xl" />
         <div className="relative text-center">
           <p className="font-display text-sm text-gold tracking-widest">戏 命 师</p>

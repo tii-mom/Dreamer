@@ -14,6 +14,8 @@ export function TopBar({
     qiyun: number;
     wallet: number;
     unread: number;
+    subscribed?: boolean;
+    subscribedUntil?: string | null;
   };
   onOpen: Dispatch<SetStateAction<ModalKey | null>>;
   onToggleSidebar: () => void;
@@ -65,7 +67,7 @@ export function TopBar({
           onClick={() => onOpen("sub")}
           className="h-9 px-3 md:px-4 rounded-lg text-xs font-semibold ritual-btn"
         >
-          订阅
+          {user.subscribed ? "契约中" : "订阅"}
         </button>
         <button
           aria-label="通知"

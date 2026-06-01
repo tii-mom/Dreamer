@@ -9,38 +9,291 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TryRouteImport } from './routes/try'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RefundRouteImport } from './routes/refund'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OperatorRouteImport } from './routes/operator'
+import { Route as DisclaimerRouteImport } from './routes/disclaimer'
+import { Route as BlindboxRouteImport } from './routes/blindbox'
+import { Route as BindRouteImport } from './routes/bind'
+import { Route as AssetsRouteImport } from './routes/assets'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SRefCodeRouteImport } from './routes/s.$refCode'
+import { Route as OperatorPayRouteImport } from './routes/operator.pay'
+import { Route as OperatorDashboardRouteImport } from './routes/operator.dashboard'
+import { Route as BindSuccessRouteImport } from './routes/bind.success'
 
+const TryRoute = TryRouteImport.update({
+  id: '/try',
+  path: '/try',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperatorRoute = OperatorRouteImport.update({
+  id: '/operator',
+  path: '/operator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DisclaimerRoute = DisclaimerRouteImport.update({
+  id: '/disclaimer',
+  path: '/disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlindboxRoute = BlindboxRouteImport.update({
+  id: '/blindbox',
+  path: '/blindbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BindRoute = BindRouteImport.update({
+  id: '/bind',
+  path: '/bind',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssetsRoute = AssetsRouteImport.update({
+  id: '/assets',
+  path: '/assets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SRefCodeRoute = SRefCodeRouteImport.update({
+  id: '/s/$refCode',
+  path: '/s/$refCode',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperatorPayRoute = OperatorPayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => OperatorRoute,
+} as any)
+const OperatorDashboardRoute = OperatorDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => OperatorRoute,
+} as any)
+const BindSuccessRoute = BindSuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => BindRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/assets': typeof AssetsRoute
+  '/bind': typeof BindRouteWithChildren
+  '/blindbox': typeof BlindboxRoute
+  '/disclaimer': typeof DisclaimerRoute
+  '/operator': typeof OperatorRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
+  '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
+  '/bind/success': typeof BindSuccessRoute
+  '/operator/dashboard': typeof OperatorDashboardRoute
+  '/operator/pay': typeof OperatorPayRoute
+  '/s/$refCode': typeof SRefCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/assets': typeof AssetsRoute
+  '/bind': typeof BindRouteWithChildren
+  '/blindbox': typeof BlindboxRoute
+  '/disclaimer': typeof DisclaimerRoute
+  '/operator': typeof OperatorRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
+  '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
+  '/bind/success': typeof BindSuccessRoute
+  '/operator/dashboard': typeof OperatorDashboardRoute
+  '/operator/pay': typeof OperatorPayRoute
+  '/s/$refCode': typeof SRefCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/assets': typeof AssetsRoute
+  '/bind': typeof BindRouteWithChildren
+  '/blindbox': typeof BlindboxRoute
+  '/disclaimer': typeof DisclaimerRoute
+  '/operator': typeof OperatorRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
+  '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
+  '/bind/success': typeof BindSuccessRoute
+  '/operator/dashboard': typeof OperatorDashboardRoute
+  '/operator/pay': typeof OperatorPayRoute
+  '/s/$refCode': typeof SRefCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/assets'
+    | '/bind'
+    | '/blindbox'
+    | '/disclaimer'
+    | '/operator'
+    | '/privacy'
+    | '/refund'
+    | '/terms'
+    | '/try'
+    | '/bind/success'
+    | '/operator/dashboard'
+    | '/operator/pay'
+    | '/s/$refCode'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/assets'
+    | '/bind'
+    | '/blindbox'
+    | '/disclaimer'
+    | '/operator'
+    | '/privacy'
+    | '/refund'
+    | '/terms'
+    | '/try'
+    | '/bind/success'
+    | '/operator/dashboard'
+    | '/operator/pay'
+    | '/s/$refCode'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/assets'
+    | '/bind'
+    | '/blindbox'
+    | '/disclaimer'
+    | '/operator'
+    | '/privacy'
+    | '/refund'
+    | '/terms'
+    | '/try'
+    | '/bind/success'
+    | '/operator/dashboard'
+    | '/operator/pay'
+    | '/s/$refCode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AssetsRoute: typeof AssetsRoute
+  BindRoute: typeof BindRouteWithChildren
+  BlindboxRoute: typeof BlindboxRoute
+  DisclaimerRoute: typeof DisclaimerRoute
+  OperatorRoute: typeof OperatorRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
+  RefundRoute: typeof RefundRoute
+  TermsRoute: typeof TermsRoute
+  TryRoute: typeof TryRoute
+  SRefCodeRoute: typeof SRefCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/try': {
+      id: '/try'
+      path: '/try'
+      fullPath: '/try'
+      preLoaderRoute: typeof TryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operator': {
+      id: '/operator'
+      path: '/operator'
+      fullPath: '/operator'
+      preLoaderRoute: typeof OperatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disclaimer': {
+      id: '/disclaimer'
+      path: '/disclaimer'
+      fullPath: '/disclaimer'
+      preLoaderRoute: typeof DisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blindbox': {
+      id: '/blindbox'
+      path: '/blindbox'
+      fullPath: '/blindbox'
+      preLoaderRoute: typeof BlindboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bind': {
+      id: '/bind'
+      path: '/bind'
+      fullPath: '/bind'
+      preLoaderRoute: typeof BindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assets': {
+      id: '/assets'
+      path: '/assets'
+      fullPath: '/assets'
+      preLoaderRoute: typeof AssetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +301,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$refCode': {
+      id: '/s/$refCode'
+      path: '/s/$refCode'
+      fullPath: '/s/$refCode'
+      preLoaderRoute: typeof SRefCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operator/pay': {
+      id: '/operator/pay'
+      path: '/pay'
+      fullPath: '/operator/pay'
+      preLoaderRoute: typeof OperatorPayRouteImport
+      parentRoute: typeof OperatorRoute
+    }
+    '/operator/dashboard': {
+      id: '/operator/dashboard'
+      path: '/dashboard'
+      fullPath: '/operator/dashboard'
+      preLoaderRoute: typeof OperatorDashboardRouteImport
+      parentRoute: typeof OperatorRoute
+    }
+    '/bind/success': {
+      id: '/bind/success'
+      path: '/success'
+      fullPath: '/bind/success'
+      preLoaderRoute: typeof BindSuccessRouteImport
+      parentRoute: typeof BindRoute
+    }
   }
 }
 
+interface BindRouteChildren {
+  BindSuccessRoute: typeof BindSuccessRoute
+}
+
+const BindRouteChildren: BindRouteChildren = {
+  BindSuccessRoute: BindSuccessRoute,
+}
+
+const BindRouteWithChildren = BindRoute._addFileChildren(BindRouteChildren)
+
+interface OperatorRouteChildren {
+  OperatorDashboardRoute: typeof OperatorDashboardRoute
+  OperatorPayRoute: typeof OperatorPayRoute
+}
+
+const OperatorRouteChildren: OperatorRouteChildren = {
+  OperatorDashboardRoute: OperatorDashboardRoute,
+  OperatorPayRoute: OperatorPayRoute,
+}
+
+const OperatorRouteWithChildren = OperatorRoute._addFileChildren(
+  OperatorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AssetsRoute: AssetsRoute,
+  BindRoute: BindRouteWithChildren,
+  BlindboxRoute: BlindboxRoute,
+  DisclaimerRoute: DisclaimerRoute,
+  OperatorRoute: OperatorRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
+  RefundRoute: RefundRoute,
+  TermsRoute: TermsRoute,
+  TryRoute: TryRoute,
+  SRefCodeRoute: SRefCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

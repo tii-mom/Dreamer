@@ -1,7 +1,19 @@
 import { motion } from "framer-motion";
-import masterImg from "@/assets/master.png";
+import { AssetImage } from "./assets/AssetImage";
 
-export function MasterAvatar({ size = 64, breath = true }: { size?: number; breath?: boolean }) {
+export function MasterAvatar({
+  size = 64,
+  breath = true,
+  assetId = "master_avatar.trainee.01",
+  priority = false,
+}: {
+  size?: number;
+  breath?: boolean;
+  assetId?: string;
+  priority?: boolean;
+}) {
+  const variant = size <= 64 ? "avatar_sm" : size <= 128 ? "avatar_md" : "avatar_lg";
+
   return (
     <div className="relative inline-block" style={{ width: size, height: size }}>
       {/* glow ring */}
@@ -16,15 +28,20 @@ export function MasterAvatar({ size = 64, breath = true }: { size?: number; brea
         <div className="absolute inset-0 rounded-full border border-dashed border-gold" />
         <div className="absolute inset-1 rounded-full border border-dotted border-primary/60" />
       </div>
-      <motion.img
-        src={masterImg}
-        alt="戏命师 命由天瞳"
+      <motion.div
         className={
           breath ? "animate-breath relative z-10 object-contain" : "relative z-10 object-contain"
         }
         style={{ width: size, height: size }}
-        draggable={false}
-      />
+      >
+        <AssetImage
+          assetId={assetId}
+          variant={variant}
+          priority={priority}
+          alt="戏命师 命由天瞳"
+          className="h-full w-full rounded-full object-cover"
+        />
+      </motion.div>
     </div>
   );
 }

@@ -13,6 +13,11 @@ interface CloudflareBindings {
   CF_AI_GATEWAY_ID?: string;
   APP_BASE_URL?: string;
   SESSION_SECRET?: string;
+  BUFPAY_AID?: string;
+  BUFPAY_SECRET?: string;
+  BUFPAY_MOCK?: string;
+  ADMIN_TOKEN?: string;
+  CLAWBOT_WEBHOOK_SECRET?: string;
   VAPID_PUBLIC_KEY?: string;
   VAPID_PRIVATE_KEY?: string;
   DEEPSEEK_CHAT_MODEL?: string;

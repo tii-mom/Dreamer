@@ -16,6 +16,8 @@ export type UserProfile = {
   shopOpen: boolean;
   unread: number;
   lastCheckinDate: string | null;
+  subscribedUntil?: string | null;
+  subscriptionPlan?: string | null;
 };
 
 export type BirthProfile = {
@@ -92,4 +94,46 @@ export type AppBootstrap = {
   birthProfile: BirthProfile | null;
   earnApplication: EarnApplication | null;
   shareAsset: ShareAsset | null;
+};
+
+export type PaymentStatus =
+  | "pending"
+  | "new"
+  | "payed"
+  | "success"
+  | "fee_error"
+  | "expire"
+  | "failed"
+  | "mock_success";
+
+export type ProductCode =
+  | "seal_unlock"
+  | "monthly_sub"
+  | "shop_contract"
+  | "operator_899"
+  | "blindbox_single"
+  | "blindbox_ten"
+  | "qiyun_topup";
+
+export type PaymentRecord = {
+  id: string;
+  userId: string;
+  orderId: string;
+  aoid?: string | null;
+  productCode: ProductCode;
+  itemName: string;
+  payType: "alipay" | "wechat";
+  priceCents: number;
+  displayPrice: string;
+  payPriceCents?: number | null;
+  status: PaymentStatus;
+  entitlementApplied: boolean;
+  referralCode?: string | null;
+  operatorUserId?: string | null;
+  qr?: string | null;
+  qrImg?: string | null;
+  qrPrice?: string | null;
+  expiresAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
 };

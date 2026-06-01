@@ -1,0 +1,2293 @@
+{
+  "generatedAt": "2026-06-01T07:26:20.851Z",
+  "assets": [
+    {
+      "id": "master.trainee.01",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 17504,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-trainee-01-thumb-240.1b29a918ae.webp"
+    },
+    {
+      "id": "master.trainee.01",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 30680,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-trainee-01-list-320.8d1346a0d0.webp"
+    },
+    {
+      "id": "master.trainee.01",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 85596,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-trainee-01-card-720.860c003807.webp"
+    },
+    {
+      "id": "master.trainee.01",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 170908,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-trainee-01-full-1024.2578996585.webp"
+    },
+    {
+      "id": "master_avatar.trainee.01",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 950,
+      "budget": 8000,
+      "url": "/assets/critical/master_avatar/master-avatar-trainee-01-avatar_sm-64.cae12fa8aa.webp"
+    },
+    {
+      "id": "master_avatar.trainee.01",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 1890,
+      "budget": 15000,
+      "url": "/assets/critical/master_avatar/master-avatar-trainee-01-avatar_md-96.a35f09a3d8.webp"
+    },
+    {
+      "id": "master_avatar.trainee.01",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 6588,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-trainee-01-avatar_lg-192.8ec6168ab7.webp"
+    },
+    {
+      "id": "master_avatar.trainee.01",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 31162,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-trainee-01-raw-512.ff92d08450.webp"
+    },
+    {
+      "id": "master.renji.01",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 22346,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-01-thumb-240.4f25c437a8.webp"
+    },
+    {
+      "id": "master.renji.01",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 38666,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-01-list-320.020ce1dbbe.webp"
+    },
+    {
+      "id": "master.renji.01",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 119538,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-01-card-720.f1d706b9dc.webp"
+    },
+    {
+      "id": "master.renji.01",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 242052,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-01-full-1024.f007fa239f.webp"
+    },
+    {
+      "id": "master_avatar.renji.01",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1238,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-01-avatar_sm-64.acffb2bebd.webp"
+    },
+    {
+      "id": "master_avatar.renji.01",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2604,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-01-avatar_md-96.4800b13c13.webp"
+    },
+    {
+      "id": "master_avatar.renji.01",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 10352,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-01-avatar_lg-192.4157c9e1fc.webp"
+    },
+    {
+      "id": "master_avatar.renji.01",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 47158,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-01-raw-512.1477171ff4.webp"
+    },
+    {
+      "id": "master.renji.02",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 21534,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-02-thumb-240.4d6e260e72.webp"
+    },
+    {
+      "id": "master.renji.02",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 38578,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-02-list-320.e3db8c610d.webp"
+    },
+    {
+      "id": "master.renji.02",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 114070,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-02-card-720.46746ab355.webp"
+    },
+    {
+      "id": "master.renji.02",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 232356,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-02-full-1024.42061df14a.webp"
+    },
+    {
+      "id": "master_avatar.renji.02",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1220,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-02-avatar_sm-64.8792edfda4.webp"
+    },
+    {
+      "id": "master_avatar.renji.02",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2446,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-02-avatar_md-96.35f588940f.webp"
+    },
+    {
+      "id": "master_avatar.renji.02",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 9882,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-02-avatar_lg-192.610855564d.webp"
+    },
+    {
+      "id": "master_avatar.renji.02",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 43398,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-02-raw-512.f85ce333c4.webp"
+    },
+    {
+      "id": "master.renji.03",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 16926,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-03-thumb-240.7ad6c92608.webp"
+    },
+    {
+      "id": "master.renji.03",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 29584,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-03-list-320.19639bf356.webp"
+    },
+    {
+      "id": "master.renji.03",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 84010,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-03-card-720.0b864b1c94.webp"
+    },
+    {
+      "id": "master.renji.03",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 178690,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-03-full-1024.4576d0b829.webp"
+    },
+    {
+      "id": "master_avatar.renji.03",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 882,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-03-avatar_sm-64.327a7aae46.webp"
+    },
+    {
+      "id": "master_avatar.renji.03",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 1830,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-03-avatar_md-96.23bc71aee3.webp"
+    },
+    {
+      "id": "master_avatar.renji.03",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 6826,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-03-avatar_lg-192.89b3938396.webp"
+    },
+    {
+      "id": "master_avatar.renji.03",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 29942,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-03-raw-512.a6370a23b9.webp"
+    },
+    {
+      "id": "master.renji.04",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 19202,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-04-thumb-240.3fef9fa24e.webp"
+    },
+    {
+      "id": "master.renji.04",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 33626,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-04-list-320.b4ad3c84d3.webp"
+    },
+    {
+      "id": "master.renji.04",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 99784,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-04-card-720.0b2187032d.webp"
+    },
+    {
+      "id": "master.renji.04",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 208036,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-04-full-1024.702304e9f1.webp"
+    },
+    {
+      "id": "master_avatar.renji.04",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1100,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-04-avatar_sm-64.eaa494c0f9.webp"
+    },
+    {
+      "id": "master_avatar.renji.04",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2206,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-04-avatar_md-96.8fe96a36f1.webp"
+    },
+    {
+      "id": "master_avatar.renji.04",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 8706,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-04-avatar_lg-192.4c456f1022.webp"
+    },
+    {
+      "id": "master_avatar.renji.04",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 40120,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-04-raw-512.15af8549ed.webp"
+    },
+    {
+      "id": "master.renji.05",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 22330,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-05-thumb-240.3c796018a0.webp"
+    },
+    {
+      "id": "master.renji.05",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 38498,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-05-list-320.0b0248a052.webp"
+    },
+    {
+      "id": "master.renji.05",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 119606,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-05-card-720.be8d9bc339.webp"
+    },
+    {
+      "id": "master.renji.05",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 243302,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-05-full-1024.99dc475b11.webp"
+    },
+    {
+      "id": "master_avatar.renji.05",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1202,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-05-avatar_sm-64.eece73884d.webp"
+    },
+    {
+      "id": "master_avatar.renji.05",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2522,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-05-avatar_md-96.6e0dab97d2.webp"
+    },
+    {
+      "id": "master_avatar.renji.05",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 9978,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-05-avatar_lg-192.3d98aa6853.webp"
+    },
+    {
+      "id": "master_avatar.renji.05",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 46790,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-05-raw-512.45ed34f333.webp"
+    },
+    {
+      "id": "master.renji.06",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 21156,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-06-thumb-240.1721373c4b.webp"
+    },
+    {
+      "id": "master.renji.06",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 36772,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-06-list-320.a74dd07746.webp"
+    },
+    {
+      "id": "master.renji.06",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 107766,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-06-card-720.5ec11bd6d3.webp"
+    },
+    {
+      "id": "master.renji.06",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 217114,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-06-full-1024.22a2fc3cdd.webp"
+    },
+    {
+      "id": "master_avatar.renji.06",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1130,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-06-avatar_sm-64.b52e03f198.webp"
+    },
+    {
+      "id": "master_avatar.renji.06",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2268,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-06-avatar_md-96.7f263dfffe.webp"
+    },
+    {
+      "id": "master_avatar.renji.06",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 9116,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-06-avatar_lg-192.f039508cb5.webp"
+    },
+    {
+      "id": "master_avatar.renji.06",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 40460,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-06-raw-512.9bc54e03eb.webp"
+    },
+    {
+      "id": "master.renji.07",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 20888,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-07-thumb-240.1ee875d28f.webp"
+    },
+    {
+      "id": "master.renji.07",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 36452,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-07-list-320.735888b1c5.webp"
+    },
+    {
+      "id": "master.renji.07",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 102242,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-07-card-720.f8715f3ed3.webp"
+    },
+    {
+      "id": "master.renji.07",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 207048,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-07-full-1024.53156f0a35.webp"
+    },
+    {
+      "id": "master_avatar.renji.07",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1136,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-07-avatar_sm-64.aa52a355aa.webp"
+    },
+    {
+      "id": "master_avatar.renji.07",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2444,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-07-avatar_md-96.79aa6b1844.webp"
+    },
+    {
+      "id": "master_avatar.renji.07",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 9440,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-07-avatar_lg-192.7b2f54559d.webp"
+    },
+    {
+      "id": "master_avatar.renji.07",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 42342,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-07-raw-512.dd28fb2995.webp"
+    },
+    {
+      "id": "master.renji.08",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 22882,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-08-thumb-240.03c7130e31.webp"
+    },
+    {
+      "id": "master.renji.08",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 40014,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-08-list-320.46bf5078e5.webp"
+    },
+    {
+      "id": "master.renji.08",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 125898,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-08-card-720.9ca0e7410c.webp"
+    },
+    {
+      "id": "master.renji.08",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 259596,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-08-full-1024.c34b698658.webp"
+    },
+    {
+      "id": "master_avatar.renji.08",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1280,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-08-avatar_sm-64.dc25e8e91c.webp"
+    },
+    {
+      "id": "master_avatar.renji.08",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2630,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-08-avatar_md-96.62ef89c5de.webp"
+    },
+    {
+      "id": "master_avatar.renji.08",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 10372,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-08-avatar_lg-192.58636cf599.webp"
+    },
+    {
+      "id": "master_avatar.renji.08",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 48830,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-08-raw-512.f4623281ce.webp"
+    },
+    {
+      "id": "master.renji.09",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 21136,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-09-thumb-240.ce2b7a86ee.webp"
+    },
+    {
+      "id": "master.renji.09",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 37402,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-09-list-320.c536044e6d.webp"
+    },
+    {
+      "id": "master.renji.09",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 118144,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-09-card-720.527bc27471.webp"
+    },
+    {
+      "id": "master.renji.09",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 245986,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-09-full-1024.c1d2bfb0c4.webp"
+    },
+    {
+      "id": "master_avatar.renji.09",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1194,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-09-avatar_sm-64.8a70ea496e.webp"
+    },
+    {
+      "id": "master_avatar.renji.09",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2446,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-09-avatar_md-96.01f11561be.webp"
+    },
+    {
+      "id": "master_avatar.renji.09",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 10018,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-09-avatar_lg-192.57a3ae3853.webp"
+    },
+    {
+      "id": "master_avatar.renji.09",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 48564,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-09-raw-512.5c82426743.webp"
+    },
+    {
+      "id": "master.renji.10",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 23146,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-10-thumb-240.945c3f162d.webp"
+    },
+    {
+      "id": "master.renji.10",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 40722,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-10-list-320.902a1d640c.webp"
+    },
+    {
+      "id": "master.renji.10",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 119626,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-10-card-720.6b5e215481.webp"
+    },
+    {
+      "id": "master.renji.10",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 241012,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-10-full-1024.a6d886f06a.webp"
+    },
+    {
+      "id": "master_avatar.renji.10",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1334,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-10-avatar_sm-64.58cc5e332a.webp"
+    },
+    {
+      "id": "master_avatar.renji.10",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2804,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-10-avatar_md-96.bfc0ae9fe0.webp"
+    },
+    {
+      "id": "master_avatar.renji.10",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 10920,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-10-avatar_lg-192.a897df1884.webp"
+    },
+    {
+      "id": "master_avatar.renji.10",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 51750,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-10-raw-512.ff79fad26c.webp"
+    },
+    {
+      "id": "master.renji.11",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 27202,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-11-thumb-240.a18fd75222.webp"
+    },
+    {
+      "id": "master.renji.11",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 46596,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-11-list-320.a699ad9be5.webp"
+    },
+    {
+      "id": "master.renji.11",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 135770,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-11-card-720.a474b441ee.webp"
+    },
+    {
+      "id": "master.renji.11",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 269514,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-11-full-1024.398e68f078.webp"
+    },
+    {
+      "id": "master_avatar.renji.11",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1474,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-11-avatar_sm-64.8300b7c54b.webp"
+    },
+    {
+      "id": "master_avatar.renji.11",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3128,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-11-avatar_md-96.bd9c642619.webp"
+    },
+    {
+      "id": "master_avatar.renji.11",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12460,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-11-avatar_lg-192.316a1ada3f.webp"
+    },
+    {
+      "id": "master_avatar.renji.11",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 58130,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-11-raw-512.d6f4e8b38c.webp"
+    },
+    {
+      "id": "master.renji.12",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 26168,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-renji-12-thumb-240.e1e6839b9f.webp"
+    },
+    {
+      "id": "master.renji.12",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 45670,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-renji-12-list-320.47c9f0234d.webp"
+    },
+    {
+      "id": "master.renji.12",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 144740,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-renji-12-card-720.1d63b103f4.webp"
+    },
+    {
+      "id": "master.renji.12",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 297162,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-renji-12-full-1024.689ebfdb4d.webp"
+    },
+    {
+      "id": "master_avatar.renji.12",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1544,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-12-avatar_sm-64.e430846756.webp"
+    },
+    {
+      "id": "master_avatar.renji.12",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3212,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-12-avatar_md-96.87013eea07.webp"
+    },
+    {
+      "id": "master_avatar.renji.12",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12596,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-12-avatar_lg-192.e3562c8928.webp"
+    },
+    {
+      "id": "master_avatar.renji.12",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 61708,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-renji-12-raw-512.5104d28cb5.webp"
+    },
+    {
+      "id": "master.dixuan.01",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 28076,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-01-thumb-240.cb57338d7c.webp"
+    },
+    {
+      "id": "master.dixuan.01",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 47848,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-01-list-320.3ac5aa73f7.webp"
+    },
+    {
+      "id": "master.dixuan.01",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 145216,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-01-card-720.aa338a27de.webp"
+    },
+    {
+      "id": "master.dixuan.01",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 279852,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-01-full-1024.76458ec1d5.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.01",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1448,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-01-avatar_sm-64.7e25719f3d.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.01",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3022,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-01-avatar_md-96.aca702c76b.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.01",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12070,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-01-avatar_lg-192.c99d54fec3.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.01",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 55440,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-01-raw-512.52dc5252e9.webp"
+    },
+    {
+      "id": "master.dixuan.02",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 28134,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-02-thumb-240.0f0f36e355.webp"
+    },
+    {
+      "id": "master.dixuan.02",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 48780,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-02-list-320.6fd1ecceeb.webp"
+    },
+    {
+      "id": "master.dixuan.02",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 148242,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-02-card-720.cba1e9cc0c.webp"
+    },
+    {
+      "id": "master.dixuan.02",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 289800,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-02-full-1024.59be16a29e.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.02",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1730,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-02-avatar_sm-64.abd12f146c.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.02",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3498,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-02-avatar_md-96.36316ecb57.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.02",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 13450,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-02-avatar_lg-192.d0446394fb.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.02",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 64168,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-02-raw-512.7e0ec92b44.webp"
+    },
+    {
+      "id": "master.dixuan.03",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 27032,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-03-thumb-240.9ad3abcb83.webp"
+    },
+    {
+      "id": "master.dixuan.03",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 46540,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-03-list-320.b5946a1490.webp"
+    },
+    {
+      "id": "master.dixuan.03",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 138170,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-03-card-720.f55087ceff.webp"
+    },
+    {
+      "id": "master.dixuan.03",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 268844,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-03-full-1024.9e92bbbd3c.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.03",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1438,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-03-avatar_sm-64.951860000f.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.03",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2996,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-03-avatar_md-96.50b6b3a3fb.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.03",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12024,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-03-avatar_lg-192.13b537dcf6.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.03",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 55634,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-03-raw-512.c36ae99785.webp"
+    },
+    {
+      "id": "master.dixuan.04",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 29356,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-04-thumb-240.e807b06518.webp"
+    },
+    {
+      "id": "master.dixuan.04",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 50116,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-04-list-320.f3473bc527.webp"
+    },
+    {
+      "id": "master.dixuan.04",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 143054,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-04-card-720.b9260337aa.webp"
+    },
+    {
+      "id": "master.dixuan.04",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 274544,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-04-full-1024.6b7e108553.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.04",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1604,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-04-avatar_sm-64.3ec55e5d40.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.04",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3318,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-04-avatar_md-96.1e297732c1.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.04",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 13180,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-04-avatar_lg-192.48700f9357.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.04",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 57676,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-04-raw-512.6c9233d924.webp"
+    },
+    {
+      "id": "master.dixuan.05",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 27460,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-05-thumb-240.9a819410e3.webp"
+    },
+    {
+      "id": "master.dixuan.05",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 47556,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-05-list-320.9e47b34fc7.webp"
+    },
+    {
+      "id": "master.dixuan.05",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 143264,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-05-card-720.bc21433375.webp"
+    },
+    {
+      "id": "master.dixuan.05",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 278660,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-05-full-1024.080b1d9004.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.05",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1366,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-05-avatar_sm-64.0a742a32f6.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.05",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2912,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-05-avatar_md-96.d122a37797.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.05",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 11888,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-05-avatar_lg-192.7ae801663b.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.05",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 55490,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-05-raw-512.8f02454887.webp"
+    },
+    {
+      "id": "master.dixuan.06",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 28962,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-06-thumb-240.edaf988e27.webp"
+    },
+    {
+      "id": "master.dixuan.06",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 50228,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-06-list-320.0e1a92e4db.webp"
+    },
+    {
+      "id": "master.dixuan.06",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 154222,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-06-card-720.62a4253e3d.webp"
+    },
+    {
+      "id": "master.dixuan.06",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 298856,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-06-full-1024.6d89b8a8e5.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.06",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1574,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-06-avatar_sm-64.01f2812b12.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.06",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3246,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-06-avatar_md-96.bbe1dac505.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.06",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12730,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-06-avatar_lg-192.9679dc2ac2.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.06",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 59238,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-06-raw-512.e42012ae70.webp"
+    },
+    {
+      "id": "master.dixuan.07",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 26292,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-07-thumb-240.77ac1f0ff2.webp"
+    },
+    {
+      "id": "master.dixuan.07",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 45526,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-07-list-320.4a3d187712.webp"
+    },
+    {
+      "id": "master.dixuan.07",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 136922,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-07-card-720.e1407bc37d.webp"
+    },
+    {
+      "id": "master.dixuan.07",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 267524,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-07-full-1024.d6acb975ac.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.07",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1340,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-07-avatar_sm-64.696707e300.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.07",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2852,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-07-avatar_md-96.28f4eb4191.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.07",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 11866,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-07-avatar_lg-192.32c8d7e737.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.07",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 55854,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-07-raw-512.fcfb426496.webp"
+    },
+    {
+      "id": "master.dixuan.08",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 27946,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-dixuan-08-thumb-240.3f4dc8c959.webp"
+    },
+    {
+      "id": "master.dixuan.08",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 49446,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-dixuan-08-list-320.19a486d912.webp"
+    },
+    {
+      "id": "master.dixuan.08",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 155054,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-dixuan-08-card-720.b220c7df6b.webp"
+    },
+    {
+      "id": "master.dixuan.08",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 309642,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-dixuan-08-full-1024.f844b5dcb8.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.08",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1338,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-08-avatar_sm-64.4a9780f7a5.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.08",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 2996,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-08-avatar_md-96.ae60903350.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.08",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12644,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-08-avatar_lg-192.a282636e91.webp"
+    },
+    {
+      "id": "master_avatar.dixuan.08",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 62024,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-dixuan-08-raw-512.dd9bd3680f.webp"
+    },
+    {
+      "id": "master.tianshu.01",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 33246,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-tianshu-01-thumb-240.0ff812d973.webp"
+    },
+    {
+      "id": "master.tianshu.01",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 57536,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-tianshu-01-list-320.3a1399a8e9.webp"
+    },
+    {
+      "id": "master.tianshu.01",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 173028,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-tianshu-01-card-720.798ba88d91.webp"
+    },
+    {
+      "id": "master.tianshu.01",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 333810,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-tianshu-01-full-1024.c026f89e38.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.01",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1990,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-01-avatar_sm-64.56d01205c9.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.01",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 4110,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-01-avatar_md-96.8ac792079a.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.01",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 15856,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-01-avatar_lg-192.a8842bf4af.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.01",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 72466,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-01-raw-512.f2f9b418ec.webp"
+    },
+    {
+      "id": "master.tianshu.02",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 33108,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-tianshu-02-thumb-240.f677f63cfb.webp"
+    },
+    {
+      "id": "master.tianshu.02",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 57756,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-tianshu-02-list-320.6e0848763d.webp"
+    },
+    {
+      "id": "master.tianshu.02",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 173236,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-tianshu-02-card-720.d91165d781.webp"
+    },
+    {
+      "id": "master.tianshu.02",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 333404,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-tianshu-02-full-1024.e38a17cb5e.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.02",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1808,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-02-avatar_sm-64.4e9611f1bc.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.02",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3752,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-02-avatar_md-96.f9733e25ea.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.02",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 14414,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-02-avatar_lg-192.8966a8d8d4.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.02",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 66492,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-02-raw-512.d1faad6023.webp"
+    },
+    {
+      "id": "master.tianshu.03",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 31998,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-tianshu-03-thumb-240.07636c2efb.webp"
+    },
+    {
+      "id": "master.tianshu.03",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 55524,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-tianshu-03-list-320.8a6622218f.webp"
+    },
+    {
+      "id": "master.tianshu.03",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 176168,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-tianshu-03-card-720.386bcb867d.webp"
+    },
+    {
+      "id": "master.tianshu.03",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 339918,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-tianshu-03-full-1024.dd54ff1c4c.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.03",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1820,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-03-avatar_sm-64.e796a733ab.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.03",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3796,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-03-avatar_md-96.1e9fe01d58.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.03",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 14934,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-03-avatar_lg-192.e922e870c4.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.03",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 71408,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-03-raw-512.501059c53c.webp"
+    },
+    {
+      "id": "master.tianshu.04",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 31148,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-tianshu-04-thumb-240.77437d2634.webp"
+    },
+    {
+      "id": "master.tianshu.04",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 54598,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-tianshu-04-list-320.c0d0c2e9d7.webp"
+    },
+    {
+      "id": "master.tianshu.04",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 169860,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-tianshu-04-card-720.78babbcdd2.webp"
+    },
+    {
+      "id": "master.tianshu.04",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 336716,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-tianshu-04-full-1024.2f8f18820f.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.04",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1682,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-04-avatar_sm-64.4cd6ab0da6.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.04",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3630,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-04-avatar_md-96.c270c3b4d8.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.04",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 14630,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-04-avatar_lg-192.d4ba97ff2c.webp"
+    },
+    {
+      "id": "master_avatar.tianshu.04",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 69360,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-tianshu-04-raw-512.1f37584566.webp"
+    },
+    {
+      "id": "master.chaos.01",
+      "kind": "master",
+      "variant": "thumb",
+      "bytes": 29506,
+      "budget": 45000,
+      "url": "/api/assets/art/master/master-chaos-01-thumb-240.116bec73af.webp"
+    },
+    {
+      "id": "master.chaos.01",
+      "kind": "master",
+      "variant": "list",
+      "bytes": 50882,
+      "budget": 80000,
+      "url": "/api/assets/art/master/master-chaos-01-list-320.60b2a85fc2.webp"
+    },
+    {
+      "id": "master.chaos.01",
+      "kind": "master",
+      "variant": "card",
+      "bytes": 155002,
+      "budget": 180000,
+      "url": "/api/assets/art/master/master-chaos-01-card-720.97ecd0e91a.webp"
+    },
+    {
+      "id": "master.chaos.01",
+      "kind": "master",
+      "variant": "full",
+      "bytes": 298220,
+      "budget": 350000,
+      "url": "/api/assets/art/master/master-chaos-01-full-1024.462c4f69bf.webp"
+    },
+    {
+      "id": "master_avatar.chaos.01",
+      "kind": "master_avatar",
+      "variant": "avatar_sm",
+      "bytes": 1448,
+      "budget": 8000,
+      "url": "/api/assets/art/master_avatar/master-avatar-chaos-01-avatar_sm-64.091fbc517b.webp"
+    },
+    {
+      "id": "master_avatar.chaos.01",
+      "kind": "master_avatar",
+      "variant": "avatar_md",
+      "bytes": 3060,
+      "budget": 15000,
+      "url": "/api/assets/art/master_avatar/master-avatar-chaos-01-avatar_md-96.412d393802.webp"
+    },
+    {
+      "id": "master_avatar.chaos.01",
+      "kind": "master_avatar",
+      "variant": "avatar_lg",
+      "bytes": 12424,
+      "budget": 35000,
+      "url": "/api/assets/art/master_avatar/master-avatar-chaos-01-avatar_lg-192.7b04174a5f.webp"
+    },
+    {
+      "id": "master_avatar.chaos.01",
+      "kind": "master_avatar",
+      "variant": "raw",
+      "bytes": 63304,
+      "budget": 90000,
+      "url": "/api/assets/art/master_avatar/master-avatar-chaos-01-raw-512.011cda585c.webp"
+    },
+    {
+      "id": "blind_box.box.standard",
+      "kind": "blind_box",
+      "variant": "box",
+      "bytes": 53782,
+      "budget": 90000,
+      "url": "/api/assets/art/blind_box/blind-box-box-standard-box-512.45c44afefd.webp"
+    },
+    {
+      "id": "blind_box.box.renji",
+      "kind": "blind_box",
+      "variant": "box",
+      "bytes": 63492,
+      "budget": 90000,
+      "url": "/api/assets/art/blind_box/blind-box-box-renji-box-512.8856044b5e.webp"
+    },
+    {
+      "id": "blind_box.box.dixuan",
+      "kind": "blind_box",
+      "variant": "box",
+      "bytes": 64390,
+      "budget": 90000,
+      "url": "/api/assets/art/blind_box/blind-box-box-dixuan-box-512.a35e13924e.webp"
+    },
+    {
+      "id": "blind_box.box.tianshu",
+      "kind": "blind_box",
+      "variant": "box",
+      "bytes": 70674,
+      "budget": 90000,
+      "url": "/api/assets/art/blind_box/blind-box-box-tianshu-box-512.40bde80d29.webp"
+    },
+    {
+      "id": "blind_box.box.chaos",
+      "kind": "blind_box",
+      "variant": "box",
+      "bytes": 57704,
+      "budget": 90000,
+      "url": "/api/assets/art/blind_box/blind-box-box-chaos-box-512.33e58dbb1a.webp"
+    },
+    {
+      "id": "blind_box.frame.01",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 27920,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-01-frame-512.90898eaa27.webp"
+    },
+    {
+      "id": "blind_box.frame.02",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 40902,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-02-frame-512.e3e0deeb54.webp"
+    },
+    {
+      "id": "blind_box.frame.03",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 49150,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-03-frame-512.a885d1c3a6.webp"
+    },
+    {
+      "id": "blind_box.frame.04",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 66432,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-04-frame-512.fb4e9c05db.webp"
+    },
+    {
+      "id": "blind_box.frame.05",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 50598,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-05-frame-512.f6d97acd1d.webp"
+    },
+    {
+      "id": "blind_box.frame.06",
+      "kind": "blind_box_effect",
+      "variant": "frame",
+      "bytes": 30502,
+      "budget": 80000,
+      "url": "/api/assets/art/blind_box_effect/blind-box-frame-06-frame-512.a8a17db7aa.webp"
+    },
+    {
+      "id": "blind_box.result.renji",
+      "kind": "blind_box_result",
+      "variant": "mobile",
+      "bytes": 160184,
+      "budget": 220000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-renji-mobile-720.aec9ec8078.webp"
+    },
+    {
+      "id": "blind_box.result.renji",
+      "kind": "blind_box_result",
+      "variant": "share",
+      "bytes": 282552,
+      "budget": 380000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-renji-share-1080.e691217518.webp"
+    },
+    {
+      "id": "blind_box.result.dixuan",
+      "kind": "blind_box_result",
+      "variant": "mobile",
+      "bytes": 200984,
+      "budget": 220000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-dixuan-mobile-720.95bc296b0c.webp"
+    },
+    {
+      "id": "blind_box.result.dixuan",
+      "kind": "blind_box_result",
+      "variant": "share",
+      "bytes": 369932,
+      "budget": 380000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-dixuan-share-1080.f4d51178fe.webp"
+    },
+    {
+      "id": "blind_box.result.tianshu",
+      "kind": "blind_box_result",
+      "variant": "mobile",
+      "bytes": 166756,
+      "budget": 220000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-tianshu-mobile-720.70fdcf5253.webp"
+    },
+    {
+      "id": "blind_box.result.tianshu",
+      "kind": "blind_box_result",
+      "variant": "share",
+      "bytes": 310386,
+      "budget": 380000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-tianshu-share-1080.f69a21d045.webp"
+    },
+    {
+      "id": "blind_box.result.chaos",
+      "kind": "blind_box_result",
+      "variant": "mobile",
+      "bytes": 197202,
+      "budget": 220000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-chaos-mobile-720.b733ec46d8.webp"
+    },
+    {
+      "id": "blind_box.result.chaos",
+      "kind": "blind_box_result",
+      "variant": "share",
+      "bytes": 348562,
+      "budget": 380000,
+      "url": "/api/assets/art/blind_box_result/blind-box-result-chaos-share-1080.cc11c03951.webp"
+    },
+    {
+      "id": "rune.silver.01",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2822,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-01-icon-96.eadf628ccd.webp"
+    },
+    {
+      "id": "rune.silver.01",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 25388,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-01-thumb-240.d6dabcceef.webp"
+    },
+    {
+      "id": "rune.silver.01",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 110540,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-01-card-720.9ea7f581cd.webp"
+    },
+    {
+      "id": "rune.silver.01",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 43956,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-01-raw-512.50a659378c.webp"
+    },
+    {
+      "id": "rune.silver.02",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2484,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-02-icon-96.f40395064e.webp"
+    },
+    {
+      "id": "rune.silver.02",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 22666,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-02-thumb-240.e73334db65.webp"
+    },
+    {
+      "id": "rune.silver.02",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 90254,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-02-card-720.860368b36c.webp"
+    },
+    {
+      "id": "rune.silver.02",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 36186,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-02-raw-512.884760e5ee.webp"
+    },
+    {
+      "id": "rune.silver.03",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2738,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-03-icon-96.de5b59f0e3.webp"
+    },
+    {
+      "id": "rune.silver.03",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 26556,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-03-thumb-240.193deaa6a2.webp"
+    },
+    {
+      "id": "rune.silver.03",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 111514,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-03-card-720.84210a9d75.webp"
+    },
+    {
+      "id": "rune.silver.03",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 44012,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-03-raw-512.b55843346c.webp"
+    },
+    {
+      "id": "rune.silver.04",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2282,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-04-icon-96.ba61168d71.webp"
+    },
+    {
+      "id": "rune.silver.04",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 20228,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-04-thumb-240.ee8b000545.webp"
+    },
+    {
+      "id": "rune.silver.04",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 84092,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-04-card-720.d3fc9ac57e.webp"
+    },
+    {
+      "id": "rune.silver.04",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 32872,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-04-raw-512.ca32c06629.webp"
+    },
+    {
+      "id": "rune.silver.05",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2540,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-05-icon-96.512377a4ea.webp"
+    },
+    {
+      "id": "rune.silver.05",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 22654,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-05-thumb-240.19f21e7018.webp"
+    },
+    {
+      "id": "rune.silver.05",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 94376,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-05-card-720.1eea81ab05.webp"
+    },
+    {
+      "id": "rune.silver.05",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 36122,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-05-raw-512.2ca67783ec.webp"
+    },
+    {
+      "id": "rune.silver.06",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2480,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-silver-06-icon-96.9da7496672.webp"
+    },
+    {
+      "id": "rune.silver.06",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 21752,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-silver-06-thumb-240.94335f3705.webp"
+    },
+    {
+      "id": "rune.silver.06",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 94626,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-silver-06-card-720.0805af6798.webp"
+    },
+    {
+      "id": "rune.silver.06",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 35968,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-silver-06-raw-512.ee2879cc42.webp"
+    },
+    {
+      "id": "rune.gold.01",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 3040,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-gold-01-icon-96.20aea497fe.webp"
+    },
+    {
+      "id": "rune.gold.01",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 27188,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-gold-01-thumb-240.802c7c8ca4.webp"
+    },
+    {
+      "id": "rune.gold.01",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 122258,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-gold-01-card-720.6482b623e5.webp"
+    },
+    {
+      "id": "rune.gold.01",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 49856,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-gold-01-raw-512.665fa0405f.webp"
+    },
+    {
+      "id": "rune.gold.02",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 3032,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-gold-02-icon-96.02021d5fc7.webp"
+    },
+    {
+      "id": "rune.gold.02",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 26126,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-gold-02-thumb-240.84d6d5fe97.webp"
+    },
+    {
+      "id": "rune.gold.02",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 108952,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-gold-02-card-720.f13bc5ebfc.webp"
+    },
+    {
+      "id": "rune.gold.02",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 48368,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-gold-02-raw-512.ccc78aca92.webp"
+    },
+    {
+      "id": "rune.gold.03",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 3518,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-gold-03-icon-96.661cc8c6c8.webp"
+    },
+    {
+      "id": "rune.gold.03",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 29550,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-gold-03-thumb-240.3430d5c604.webp"
+    },
+    {
+      "id": "rune.gold.03",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 127696,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-gold-03-card-720.3a0f8055bc.webp"
+    },
+    {
+      "id": "rune.gold.03",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 55678,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-gold-03-raw-512.f2db17b9e2.webp"
+    },
+    {
+      "id": "rune.gold.04",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2706,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-gold-04-icon-96.7ecaf3898c.webp"
+    },
+    {
+      "id": "rune.gold.04",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 24574,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-gold-04-thumb-240.aa7bf9b481.webp"
+    },
+    {
+      "id": "rune.gold.04",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 98310,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-gold-04-card-720.3e9622070c.webp"
+    },
+    {
+      "id": "rune.gold.04",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 43362,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-gold-04-raw-512.8507f61f5c.webp"
+    },
+    {
+      "id": "rune.chaos.01",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 2800,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-chaos-01-icon-96.ff5ccb4739.webp"
+    },
+    {
+      "id": "rune.chaos.01",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 26144,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-chaos-01-thumb-240.047516f1c9.webp"
+    },
+    {
+      "id": "rune.chaos.01",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 115020,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-chaos-01-card-720.6b773acf82.webp"
+    },
+    {
+      "id": "rune.chaos.01",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 47710,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-chaos-01-raw-512.eb5f4b0f1e.webp"
+    },
+    {
+      "id": "rune.chaos.02",
+      "kind": "rune",
+      "variant": "icon",
+      "bytes": 3158,
+      "budget": 15000,
+      "url": "/api/assets/art/rune/rune-chaos-02-icon-96.6b9077ef6a.webp"
+    },
+    {
+      "id": "rune.chaos.02",
+      "kind": "rune",
+      "variant": "thumb",
+      "bytes": 29336,
+      "budget": 45000,
+      "url": "/api/assets/art/rune/rune-chaos-02-thumb-240.ff9207cb35.webp"
+    },
+    {
+      "id": "rune.chaos.02",
+      "kind": "rune",
+      "variant": "card",
+      "bytes": 133310,
+      "budget": 180000,
+      "url": "/api/assets/art/rune/rune-chaos-02-card-720.7169e38cb4.webp"
+    },
+    {
+      "id": "rune.chaos.02",
+      "kind": "rune",
+      "variant": "raw",
+      "bytes": 55224,
+      "budget": 90000,
+      "url": "/api/assets/art/rune/rune-chaos-02-raw-512.d64154a2da.webp"
+    },
+    {
+      "id": "share.daily",
+      "kind": "share",
+      "variant": "mobile",
+      "bytes": 110362,
+      "budget": 220000,
+      "url": "/api/assets/art/share/share-daily-mobile-720.4a371374f6.webp"
+    },
+    {
+      "id": "share.daily",
+      "kind": "share",
+      "variant": "share",
+      "bytes": 201456,
+      "budget": 380000,
+      "url": "/api/assets/art/share/share-daily-share-1080.c8a9cef653.webp"
+    },
+    {
+      "id": "share.seal",
+      "kind": "share",
+      "variant": "mobile",
+      "bytes": 204414,
+      "budget": 220000,
+      "url": "/api/assets/art/share/share-seal-mobile-720.d3aa2d7847.webp"
+    },
+    {
+      "id": "share.seal",
+      "kind": "share",
+      "variant": "share",
+      "bytes": 366506,
+      "budget": 380000,
+      "url": "/api/assets/art/share/share-seal-share-1080.d0d9b0c076.webp"
+    },
+    {
+      "id": "share.earn",
+      "kind": "share",
+      "variant": "mobile",
+      "bytes": 181534,
+      "budget": 220000,
+      "url": "/api/assets/art/share/share-earn-mobile-720.aaf68635cf.webp"
+    },
+    {
+      "id": "share.earn",
+      "kind": "share",
+      "variant": "share",
+      "bytes": 319260,
+      "budget": 380000,
+      "url": "/api/assets/art/share/share-earn-share-1080.29c8ef0efb.webp"
+    },
+    {
+      "id": "share.box_result",
+      "kind": "share",
+      "variant": "mobile",
+      "bytes": 204184,
+      "budget": 220000,
+      "url": "/api/assets/art/share/share-box-result-mobile-720.4132f97762.webp"
+    },
+    {
+      "id": "share.box_result",
+      "kind": "share",
+      "variant": "share",
+      "bytes": 365792,
+      "budget": 380000,
+      "url": "/api/assets/art/share/share-box-result-share-1080.c8aaac9028.webp"
+    },
+    {
+      "id": "ui.coin",
+      "kind": "ui",
+      "variant": "icon",
+      "bytes": 3560,
+      "budget": 15000,
+      "url": "/assets/critical/ui/ui-coin-icon-96.a963cabbb7.webp"
+    },
+    {
+      "id": "ui.ticket",
+      "kind": "ui",
+      "variant": "icon",
+      "bytes": 3128,
+      "budget": 15000,
+      "url": "/assets/critical/ui/ui-ticket-icon-96.6ed0075171.webp"
+    },
+    {
+      "id": "ui.loading_oracle",
+      "kind": "ui",
+      "variant": "icon",
+      "bytes": 3106,
+      "budget": 15000,
+      "url": "/assets/critical/ui/ui-loading-oracle-icon-96.0b174dbbd7.webp"
+    }
+  ]
+}

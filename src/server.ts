@@ -3,6 +3,12 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { logEvent } from "./lib/server/xms-store.server";
+import {
+  handleBufPayCallback,
+  handleMockPaymentSuccess,
+  handleAdminRequest,
+} from "./lib/server/xms-payment.server";
+import { clawbotWebhookHandler } from "./lib/server/xms-bot.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -42,6 +48,22 @@ export default {
   async fetch(request: Request, env: CloudflareBindings = {}, ctx?: ExecutionContext) {
     try {
       const url = new URL(request.url);
+      if (url.pathname === "/api/bot/clawbot/webhook") {
+        return clawbotWebhookHandler(request, env);
+      }
+
+      if (url.pathname === "/api/pay/callback" && request.method === "POST") {
+        return handleBufPayCallback(request, env);
+      }
+
+      if (url.pathname === "/api/pay/mock-success" && request.method === "POST") {
+        return handleMockPaymentSuccess(request, env);
+      }
+
+      if (url.pathname.startsWith("/api/admin/")) {
+        return handleAdminRequest(request, env);
+      }
+
       if (url.pathname.startsWith("/api/assets/")) {
         return serveR2Asset(request, env);
       }

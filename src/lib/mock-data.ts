@@ -34,8 +34,8 @@ export const sidebarItems = [
   { key: "rune", group: "assets", icon: "📜", label: "铭文", note: "可镶嵌铭文增强属性" },
   { key: "sub", group: "growth", icon: "✦", label: "订阅", note: "每日流日 + 吉时提醒" },
   { key: "topup", group: "growth", icon: "🪙", label: "充值", note: "增加问事次数" },
-  { key: "earn", group: "growth", icon: "⚔️", label: "出马赚钱", note: "开通命铺接单赚钱" },
-  { key: "income", group: "growth", icon: "💰", label: "我的收益", note: "昨日净利 ¥843" },
+  { key: "earn", group: "growth", icon: "⚔️", label: "服务设计", note: "设计专属咨询服务菜单" },
+  { key: "income", group: "growth", icon: "💰", label: "历史报告", note: "昨日生成 12 份报告" },
   { key: "friends", group: "growth", icon: "🤝", label: "好友助力", note: "邀请好友解锁命盘进度" },
   { key: "settings", group: "settings", icon: "⚙️", label: "设置", note: "" },
 ];
@@ -66,6 +66,9 @@ export const marketItems = [
     change: +12.4,
     spec: "紫微斗数 / 八字 / 面相",
     kind: "master",
+    assetId: "master.tianshu.01",
+    assetKind: "master",
+    thumbVariant: "thumb",
   },
   {
     id: 2,
@@ -76,6 +79,9 @@ export const marketItems = [
     change: -3.1,
     spec: "合婚 / 风水择日",
     kind: "master",
+    assetId: "master.dixuan.01",
+    assetKind: "master",
+    thumbVariant: "thumb",
   },
   {
     id: 3,
@@ -86,6 +92,9 @@ export const marketItems = [
     change: +0.8,
     spec: "塔罗 / 每日运势",
     kind: "master",
+    assetId: "master.renji.01",
+    assetKind: "master",
+    thumbVariant: "thumb",
   },
   {
     id: 4,
@@ -96,6 +105,9 @@ export const marketItems = [
     change: +6.6,
     spec: "财运类增强",
     kind: "rune",
+    assetId: "rune.gold.01",
+    assetKind: "rune",
+    thumbVariant: "icon",
   },
   {
     id: 5,
@@ -106,6 +118,9 @@ export const marketItems = [
     change: -1.2,
     spec: "人心洞察类",
     kind: "rune",
+    assetId: "rune.silver.02",
+    assetKind: "rune",
+    thumbVariant: "icon",
   },
   {
     id: 6,
@@ -116,6 +131,9 @@ export const marketItems = [
     change: +2.3,
     spec: "贵人提携类",
     kind: "rune",
+    assetId: "rune.gold.02",
+    assetKind: "rune",
+    thumbVariant: "icon",
   },
 ];
 

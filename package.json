@@ -13,6 +13,11 @@
     "db:migrate:local": "wrangler d1 migrations apply xms-dialogue-game --local",
     "db:migrate:remote": "wrangler d1 migrations apply xms-dialogue-game --remote",
     "art:import": "node scripts/import-art-asset.mjs",
+    "art:audit": "node scripts/audit-art-assets.mjs",
+    "art:build": "node scripts/build-art-assets.mjs",
+    "art:manifest": "node scripts/generate-asset-manifest.mjs",
+    "art:upload": "node scripts/upload-art-assets.mjs",
+    "art:verify": "node scripts/verify-art-assets.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

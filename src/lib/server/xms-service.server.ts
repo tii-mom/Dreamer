@@ -23,6 +23,10 @@ import {
   saveShareAsset,
   todayKey,
   updateUser,
+  createPaymentRecord,
+  attachProviderPayment,
+  getPaymentByOrderId,
+  getPaymentByAoid,
 } from "./xms-store.server";
 import { generateMasterReply } from "./xms-ai.server";
 import type {
@@ -33,6 +37,8 @@ import type {
   DailyState,
   ShareAsset,
   UserProfile,
+  PaymentRecord,
+  ProductCode,
 } from "../domain";
 
 export type SessionCookieWriter = (token: string) => void;
@@ -150,6 +156,17 @@ export async function ensureSessionFromToken(
     const session = await createSession(env, user.id);
     writeCookie?.(session.token);
     await logEvent(env, user.id, "session_created", { source: "web" });
+  } else {
+    if (
+      user.subscribed &&
+      user.subscribedUntil &&
+      new Date(user.subscribedUntil).getTime() <= Date.now()
+    ) {
+      user.subscribed = false;
+      user.asksMax = 1;
+      user = await updateUser(env, user);
+      await logEvent(env, user.id, "subscription_expired", { expiredAt: user.subscribedUntil });
+    }
   }
   const threadId = await getOrCreateThread(env, user.id);
   const messages = await seedOnboardingIfNeeded(env, user, threadId);
@@ -446,4 +463,249 @@ export async function recordEvent(
   const user = await getUserBySession(env, token);
   await logEvent(env, user?.id ?? null, name, props);
   return { ok: true };
+}
+
+// Payment Service Implementations
+import { md5 } from "./xms-payment.server";
+
+const PRODUCTS = {
+  seal_unlock: {
+    name: "解封命盘",
+    priceCents: 599,
+  },
+  monthly_sub: {
+    name: "趋吉避凶 · 月令契约",
+    priceCents: 4999,
+  },
+  monthly_sub_30d: {
+    name: "趋吉避凶 · 月令契约 30 天",
+    priceCents: 4999,
+  },
+  shop_contract: {
+    name: "戏命出马 · 命铺契约",
+    priceCents: 89900,
+  },
+  operator_899: {
+    name: "命铺经营者",
+    priceCents: 89900,
+  },
+  blindbox_single: {
+    name: "单抽盲盒",
+    priceCents: 9900,
+  },
+  blindbox_ten: {
+    name: "十连盲盒",
+    priceCents: 88800,
+  },
+  qiyun_topup: {
+    name: "供奉香火",
+    priceCents: 0, // dynamic
+  },
+} as const;
+
+export async function createPaymentOrderService(
+  context: unknown,
+  token: string | undefined,
+  input: {
+    productCode: ProductCode;
+    payType: "alipay" | "wechat";
+    amountCents?: number;
+  },
+) {
+  const env = getRuntimeEnv(context);
+  const bootstrap = await ensureSessionFromToken(context, token);
+  const user = bootstrap.user;
+
+  const product = PRODUCTS[input.productCode];
+  if (!product) {
+    throw new Error("商品不存在");
+  }
+
+  let priceCents = product.priceCents;
+  if (input.productCode === "qiyun_topup") {
+    if (!input.amountCents || input.amountCents < 100 || input.amountCents > 1000000) {
+      throw new Error("无效的充值金额");
+    }
+    priceCents = input.amountCents;
+  }
+
+  const displayPrice = (priceCents / 100).toFixed(2);
+  const orderId = randomId("pay");
+
+  // Create local record as pending
+  const localRecord = await createPaymentRecord(env, {
+    id: randomId("payrec"),
+    userId: user.id,
+    orderId,
+    productCode: input.productCode,
+    itemName: product.name,
+    payType: input.payType,
+    priceCents,
+    displayPrice,
+    status: "pending",
+    entitlementApplied: false,
+  });
+
+  const aid = env.BUFPAY_AID;
+  const secretKey = env.BUFPAY_SECRET || env.SESSION_SECRET || "MOCK_SECRET";
+  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+
+  if (isMock) {
+    // Return mock payment info
+    const mockAoid = `mock_${randomId("aoid")}`;
+    const mockQr = "https://bufpay.com/mock-payment-qr";
+    const mockQrImg =
+      "data:image/svg+xml;charset=utf-8," +
+      encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#1b1227" stroke="#d7a94d" stroke-width="4"/><text x="100" y="90" fill="#ffe8a3" text-anchor="middle" font-size="14" font-weight="bold">测试模式 · 模拟二维码</text><text x="100" y="115" fill="#a98a4b" text-anchor="middle" font-size="11">扫码将模拟完成支付</text><text x="100" y="145" fill="#f7eed6" text-anchor="middle" font-size="14" font-weight="bold">¥${displayPrice}</text></svg>`,
+      );
+
+    await attachProviderPayment(env, orderId, {
+      aoid: mockAoid,
+      qr: mockQr,
+      qrImg: mockQrImg,
+      qrPrice: displayPrice,
+      expiresInSeconds: 300,
+      rawJson: JSON.stringify({ mock: true }),
+    });
+
+    const updated = await getPaymentByOrderId(env, orderId);
+    return {
+      status: "ok",
+      orderId,
+      aoid: mockAoid,
+      payType: input.payType,
+      price: displayPrice,
+      qrPrice: displayPrice,
+      qr: mockQr,
+      qrImg: mockQrImg,
+      expiresIn: 300,
+      isMock: true,
+    };
+  }
+
+  // Real production integration with BufPay
+  const notifyUrl = `${env.APP_BASE_URL || ""}/api/pay/callback`;
+  const returnUrl = `${env.APP_BASE_URL || ""}/?pay_return=${orderId}`;
+  const feedbackUrl = `${env.APP_BASE_URL || ""}/?pay_feedback=${orderId}`;
+
+  // Signature calculation: name + pay_type + price + order_id + order_uid + notify_url + return_url + feedback_url + secret
+  const signString = `${product.name}${input.payType}${displayPrice}${orderId}${user.id}${notifyUrl}${returnUrl}${feedbackUrl}${secretKey}`;
+  const sign = md5(signString);
+
+  const bodyParams = new URLSearchParams({
+    name: product.name,
+    pay_type: input.payType,
+    price: displayPrice,
+    order_id: orderId,
+    order_uid: user.id,
+    notify_url: notifyUrl,
+    return_url: returnUrl,
+    feedback_url: feedbackUrl,
+    sign,
+  });
+
+  try {
+    const response = await fetch(
+      `https://bufpay.com/api/pay/${aid}?format=json&expire=300&user_cache=true`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: bodyParams,
+      },
+    );
+
+    const data = (await response.json()) as Record<string, unknown>;
+    if (data && data.status === "ok") {
+      await attachProviderPayment(env, orderId, {
+        aoid: String(data.aoid),
+        qr: String(data.qr),
+        qrImg: String(data.qr_img),
+        qrPrice: String(data.qr_price),
+        expiresInSeconds: Number(data.expires_in || 300),
+        rawJson: JSON.stringify(data),
+      });
+
+      return {
+        status: "ok",
+        orderId,
+        aoid: String(data.aoid),
+        payType: String(data.pay_type),
+        price: String(data.price),
+        qrPrice: String(data.qr_price),
+        qr: String(data.qr),
+        qrImg: String(data.qr_img),
+        expiresIn: Number(data.expires_in || 300),
+        isMock: false,
+      };
+    } else {
+      console.error("[BufPay] Failed to create order:", data);
+      throw new Error(data?.status || "BufPay Request Failed");
+    }
+  } catch (error) {
+    console.error("[BufPay] Error creating order:", error);
+    throw error;
+  }
+}
+
+export async function queryPaymentStatusService(
+  context: unknown,
+  token: string | undefined,
+  input: { orderId: string },
+) {
+  const env = getRuntimeEnv(context);
+  const payment = await getPaymentByOrderId(env, input.orderId);
+  if (!payment) {
+    throw new Error("订单不存在");
+  }
+
+  // If local status is already success, return it immediately
+  if (payment.status === "success" || payment.status === "mock_success") {
+    return { status: payment.status, priceCents: payment.priceCents };
+  }
+
+  const aid = env.BUFPAY_AID;
+  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+
+  // If not mock and we have an aoid, query BufPay API directly to sync in case callback was delayed
+  if (
+    !isMock &&
+    payment.aoid &&
+    (payment.status === "pending" || payment.status === "new" || payment.status === "payed")
+  ) {
+    try {
+      const response = await fetch(`https://bufpay.com/api/query/${payment.aoid}`);
+      const data = (await response.json()) as Record<string, unknown>;
+
+      // BufPay statuses: new, payed, success, fee_error, expire
+      if (data && data.status) {
+        if (data.status === "success" || data.status === "payed") {
+          // Sync locally and trigger entitlement
+          const localStatus = data.status === "success" ? "success" : "payed";
+          await updatePaymentStatus(env, payment.orderId, localStatus, {
+            payPriceCents: payment.priceCents,
+            callbackRawJson: JSON.stringify(data),
+          });
+
+          if (data.status === "success") {
+            const updated = await getPaymentByOrderId(env, payment.orderId);
+            if (updated) {
+              await applyPaymentEntitlement(env, updated);
+            }
+            return { status: "success", priceCents: payment.priceCents };
+          }
+        } else if (data.status === "expire") {
+          await updatePaymentStatus(env, payment.orderId, "expire");
+        }
+      }
+    } catch (err) {
+      console.error("[BufPay Query] Failed to query status from provider:", err);
+    }
+  }
+
+  // Refetch to return latest local status
+  const current = await getPaymentByOrderId(env, input.orderId);
+  return { status: current?.status || payment.status, priceCents: payment.priceCents };
 }

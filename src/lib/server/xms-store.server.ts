@@ -1,4 +1,4 @@
-import type {
+import {
   BirthProfile,
   ChatMsg,
   DailyFortune,
@@ -7,6 +7,9 @@ import type {
   EarnApplication,
   ShareAsset,
   UserProfile,
+  PaymentRecord,
+  PaymentStatus,
+  ProductCode,
 } from "../domain";
 
 export const SESSION_COOKIE = "xms_session";
@@ -26,7 +29,7 @@ type ThreadRecord = {
   updatedAt: string;
 };
 
-type DevStore = {
+export type DevStore = {
   users: Map<string, UserProfile>;
   sessions: Map<string, SessionRecord>;
   birthProfiles: Map<string, BirthProfile>;
@@ -35,6 +38,15 @@ type DevStore = {
   dailyStates: Map<string, DailyState>;
   shares: Map<string, ShareAsset[]>;
   earnApplications: Map<string, EarnApplication>;
+  payments: Map<string, PaymentRecord>;
+  wechatBindings: Map<string, Record<string, unknown>>;
+  botMessages: Map<string, Record<string, unknown>>;
+  operators: Map<string, Record<string, unknown>>;
+  operatorReferrals: Map<string, Record<string, unknown>>;
+  userAssets: Map<string, Record<string, unknown>>;
+  inscriptionEquips: Map<string, Record<string, unknown>>;
+  blindboxDraws: Map<string, Record<string, unknown>>;
+  rewardLedger: Map<string, Record<string, unknown>>;
   events: Array<{
     id: string;
     userId: string | null;
@@ -53,7 +65,7 @@ type DevStore = {
   }>;
 };
 
-function devStore(): DevStore {
+export function devStore(): DevStore {
   const global = globalThis as typeof globalThis & { __xmsDevStore?: DevStore };
   if (!global.__xmsDevStore) {
     global.__xmsDevStore = {
@@ -65,6 +77,15 @@ function devStore(): DevStore {
       dailyStates: new Map(),
       shares: new Map(),
       earnApplications: new Map(),
+      payments: new Map(),
+      wechatBindings: new Map(),
+      botMessages: new Map(),
+      operators: new Map(),
+      operatorReferrals: new Map(),
+      userAssets: new Map(),
+      inscriptionEquips: new Map(),
+      blindboxDraws: new Map(),
+      rewardLedger: new Map(),
       events: [],
       aiLogs: [],
     };
@@ -181,6 +202,8 @@ function mapUser(row: Record<string, unknown>): UserProfile {
     shopOpen: toBool(row.shop_open),
     unread: Number(row.unread ?? 0),
     lastCheckinDate: row.last_checkin_date ? String(row.last_checkin_date) : null,
+    subscribedUntil: row.subscribed_until ? String(row.subscribed_until) : null,
+    subscriptionPlan: row.subscription_plan ? String(row.subscription_plan) : null,
   };
 }
 
@@ -268,6 +291,8 @@ export async function createUser(env: CloudflareBindings) {
     shopOpen: false,
     unread: 7,
     lastCheckinDate: null,
+    subscribedUntil: null,
+    subscriptionPlan: null,
   };
   if (env.DB) {
     await env.DB.prepare(
@@ -299,7 +324,7 @@ export async function createUser(env: CloudflareBindings) {
 export async function updateUser(env: CloudflareBindings, user: UserProfile) {
   if (env.DB) {
     await env.DB.prepare(
-      "UPDATE users SET nickname = ?, level = ?, qiyun = ?, wallet = ?, streak = ?, asks_today = ?, asks_max = ?, seal_unlocked = ?, chart_glow = ?, subscribed = ?, shop_open = ?, unread = ?, last_checkin_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      "UPDATE users SET nickname = ?, level = ?, qiyun = ?, wallet = ?, streak = ?, asks_today = ?, asks_max = ?, seal_unlocked = ?, chart_glow = ?, subscribed = ?, shop_open = ?, unread = ?, last_checkin_date = ?, subscribed_until = ?, subscription_plan = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
     )
       .bind(
         user.nickname,
@@ -315,6 +340,8 @@ export async function updateUser(env: CloudflareBindings, user: UserProfile) {
         boolInt(user.shopOpen),
         user.unread,
         user.lastCheckinDate,
+        user.subscribedUntil ?? null,
+        user.subscriptionPlan ?? null,
         user.id,
       )
       .run();
@@ -680,5 +707,178 @@ export async function logAiCall(
       .run();
   } else {
     devStore().aiLogs.push({ id: randomId("ai"), ...input, createdAt: nowIso() });
+  }
+}
+
+// Payment Store Helpers
+function mapPayment(row: Record<string, unknown>): PaymentRecord {
+  return {
+    id: String(row.id),
+    userId: String(row.user_id),
+    orderId: String(row.order_id),
+    aoid: row.aoid ? String(row.aoid) : null,
+    productCode: String(row.product_code) as ProductCode,
+    itemName: String(row.item_name),
+    payType: String(row.pay_type) as "alipay" | "wechat",
+    priceCents: Number(row.price_cents ?? 0),
+    displayPrice: String(row.display_price),
+    payPriceCents: row.pay_price_cents ? Number(row.pay_price_cents) : null,
+    status: String(row.status) as PaymentStatus,
+    entitlementApplied: toBool(row.entitlement_applied),
+    qr: row.qr ? String(row.qr) : null,
+    qrImg: row.qr_img ? String(row.qr_img) : null,
+    qrPrice: row.qr_price ? String(row.qr_price) : null,
+    expiresAt: row.expires_at ? String(row.expires_at) : null,
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
+}
+
+export async function createPaymentRecord(
+  env: CloudflareBindings,
+  record: Omit<PaymentRecord, "createdAt" | "updatedAt">,
+) {
+  const now = nowIso();
+  const payment: PaymentRecord = {
+    ...record,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  if (env.DB) {
+    await env.DB.prepare(
+      "INSERT INTO payments (id, user_id, order_id, aoid, product_code, item_name, pay_type, price_cents, display_price, status, entitlement_applied, referral_code, operator_user_id, qr, qr_img, qr_price, expires_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+      .bind(
+        payment.id,
+        payment.userId,
+        payment.orderId,
+        payment.aoid ?? null,
+        payment.productCode,
+        payment.itemName,
+        payment.payType,
+        payment.priceCents,
+        payment.displayPrice,
+        payment.status,
+        boolInt(payment.entitlementApplied),
+        payment.referralCode ?? null,
+        payment.operatorUserId ?? null,
+        payment.qr ?? null,
+        payment.qrImg ?? null,
+        payment.qrPrice ?? null,
+        payment.expiresAt ?? null,
+        payment.createdAt,
+        payment.updatedAt,
+      )
+      .run();
+  } else {
+    devStore().payments.set(payment.orderId, payment);
+  }
+  return payment;
+}
+
+export async function attachProviderPayment(
+  env: CloudflareBindings,
+  orderId: string,
+  providerDetails: {
+    aoid: string;
+    qr?: string | null;
+    qrImg?: string | null;
+    qrPrice?: string | null;
+    expiresInSeconds: number;
+    rawJson: string;
+  },
+) {
+  const expiresAt = new Date(Date.now() + providerDetails.expiresInSeconds * 1000).toISOString();
+  if (env.DB) {
+    await env.DB.prepare(
+      "UPDATE payments SET aoid = ?, qr = ?, qr_img = ?, qr_price = ?, expires_at = ?, provider_raw_json = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
+    )
+      .bind(
+        providerDetails.aoid,
+        providerDetails.qr ?? null,
+        providerDetails.qrImg ?? null,
+        providerDetails.qrPrice ?? null,
+        expiresAt,
+        providerDetails.rawJson,
+        orderId,
+      )
+      .run();
+  } else {
+    const payment = devStore().payments.get(orderId);
+    if (payment) {
+      payment.aoid = providerDetails.aoid;
+      payment.qr = providerDetails.qr;
+      payment.qrImg = providerDetails.qrImg;
+      payment.qrPrice = providerDetails.qrPrice;
+      payment.expiresAt = expiresAt;
+      payment.updatedAt = nowIso();
+    }
+  }
+}
+
+export async function getPaymentByOrderId(env: CloudflareBindings, orderId: string) {
+  if (env.DB) {
+    const row = await env.DB.prepare("SELECT * FROM payments WHERE order_id = ?")
+      .bind(orderId)
+      .first<Record<string, unknown>>();
+    return row ? mapPayment(row) : null;
+  }
+  return devStore().payments.get(orderId) ?? null;
+}
+
+export async function getPaymentByAoid(env: CloudflareBindings, aoid: string) {
+  if (env.DB) {
+    const row = await env.DB.prepare("SELECT * FROM payments WHERE aoid = ?")
+      .bind(aoid)
+      .first<Record<string, unknown>>();
+    return row ? mapPayment(row) : null;
+  }
+  const match = Array.from(devStore().payments.values()).find((p) => p.aoid === aoid);
+  return match ?? null;
+}
+
+export async function updatePaymentStatus(
+  env: CloudflareBindings,
+  orderId: string,
+  status: PaymentStatus,
+  extra?: { payPriceCents?: number; callbackRawJson?: string },
+) {
+  if (env.DB) {
+    await env.DB.prepare(
+      "UPDATE payments SET status = ?, pay_price_cents = ?, callback_raw_json = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
+    )
+      .bind(status, extra?.payPriceCents ?? null, extra?.callbackRawJson ?? null, orderId)
+      .run();
+  } else {
+    const payment = devStore().payments.get(orderId);
+    if (payment) {
+      payment.status = status;
+      if (extra?.payPriceCents !== undefined) payment.payPriceCents = extra.payPriceCents;
+      payment.updatedAt = nowIso();
+    }
+  }
+}
+
+export async function markPaymentEntitlementApplied(
+  env: CloudflareBindings,
+  orderId: string,
+): Promise<boolean> {
+  if (env.DB) {
+    const res = await env.DB.prepare(
+      "UPDATE payments SET entitlement_applied = 1, updated_at = CURRENT_TIMESTAMP WHERE order_id = ? AND entitlement_applied = 0",
+    )
+      .bind(orderId)
+      .run();
+    // In D1, changes is the count of rows modified.
+    return (res.meta.changes ?? 0) === 1;
+  } else {
+    const payment = devStore().payments.get(orderId);
+    if (payment && !payment.entitlementApplied) {
+      payment.entitlementApplied = true;
+      payment.updatedAt = nowIso();
+      return true;
+    }
+    return false;
   }
 }
