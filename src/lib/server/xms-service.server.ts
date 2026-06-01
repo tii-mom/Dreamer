@@ -217,28 +217,34 @@ export async function handleUserMessage(
   let birthProfile = bootstrap.birthProfile;
 
   // Handle birth info input → generate chart
-  if (!birthProfile && isBirthText(text)) {
-    const parsed = parseBirthProfileFromText(text) ?? {
-      calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
-      birthDate: todayKey(),
-      gender: "unknown",
-      rawText: text,
-    };
-    await saveBirthProfileRecord(env, user.id, parsed);
-    birthProfile = parsed;
-    // Generate chart if birth time is available
-    if (parsed.birthTime) {
-      try {
-        await saveOrUpdateUserChart(env, user.id, parsed);
-      } catch {
-        // Chart generation failed — that's OK
+  if (isBirthText(text)) {
+    const parsed = parseBirthProfileFromText(text);
+    if (parsed) {
+      const shouldReplace =
+        !birthProfile ||
+        !birthProfile.birthTime ||
+        Boolean(parsed.birthTime) ||
+        parsed.rawText !== birthProfile.rawText;
+
+      if (shouldReplace) {
+        await saveBirthProfileRecord(env, user.id, parsed);
+        birthProfile = parsed;
+
+        if (parsed.birthTime) {
+          try {
+            await saveOrUpdateUserChart(env, user.id, parsed);
+          } catch {
+            // Chart generation failed — that's OK
+          }
+        }
+
+        user = await updateUser(env, {
+          ...user,
+          sealUnlocked: Math.max(user.sealUnlocked, 30),
+          chartGlow: Math.max(user.chartGlow, 38),
+        });
       }
     }
-    user = await updateUser(env, {
-      ...user,
-      sealUnlocked: Math.max(user.sealUnlocked, 30),
-      chartGlow: Math.max(user.chartGlow, 38),
-    });
   }
 
   // Get or create chart for prompt context
@@ -536,8 +542,20 @@ export async function createPaymentOrderService(
     operatorUserId,
   });
 
-  const aid = env.BUFPAY_AID;
-  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+  const isProd =
+    env.APP_BASE_URL &&
+    !env.APP_BASE_URL.includes("localhost") &&
+    !env.APP_BASE_URL.includes("127.0.0.1");
+
+  const isMock = env.BUFPAY_MOCK === "true" && !isProd;
+
+  if (!isMock && !env.BUFPAY_AID) {
+    throw new Error("BUFPAY_AID not configured");
+  }
+
+  if (!isMock && !env.BUFPAY_SECRET) {
+    throw new Error("BUFPAY_SECRET not configured");
+  }
 
   if (isMock) {
     // Return mock payment info
@@ -655,7 +673,7 @@ export async function queryPaymentStatusService(
   }
 
   const aid = env.BUFPAY_AID;
-  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+  const isMock = env.BUFPAY_MOCK === "true";
 
   // If not mock and we have an aoid, query BufPay API directly to sync in case callback was delayed
   if (

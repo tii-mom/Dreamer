@@ -124,10 +124,13 @@ export async function consumeBotTicket(
   }
 
   // Memory store fallback
-  const stored = devStore().botTickets.get(ticket) as unknown as BotTicket | undefined;
+  const stored = devStore().botTickets.get(ticket) as BotTicket | undefined;
   if (!stored) return null;
   if (new Date(stored.expiresAt).getTime() < Date.now()) return null;
   if (stored.usedAt) return null;
+
+  stored.usedAt = nowIso();
+  devStore().botTickets.set(ticket, stored as unknown as Record<string, unknown>);
   return stored;
 }
 
@@ -163,5 +166,10 @@ export async function validateBotTicket(
     };
   }
 
-  return null;
+  // Memory store fallback
+  const stored = devStore().botTickets.get(ticket) as BotTicket | undefined;
+  if (!stored) return null;
+  if (new Date(stored.expiresAt).getTime() < Date.now()) return null;
+  if (stored.usedAt) return null;
+  return stored;
 }
