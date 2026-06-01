@@ -56,3 +56,11 @@ export const bindReferralSession = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const getOperatorDetails = createServerFn({ method: "GET" }).handler(async ({ context }) => {
+  const env = getRuntimeEnv(context);
+  const user = await getUserBySession(env, token());
+  if (!user) return null;
+  const details = await getOperatorByUserId(env, user.id);
+  return details;
+});
