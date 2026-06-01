@@ -2,17 +2,21 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { logEvent } from "./lib/server/xms-store.server";
+import { escapeHtml, renderFallbackReport, wrapReportHtml } from "./lib/fortune/report-html";
+import { maybeClawbotReportIngestHandler } from "./lib/server/xms-bot-report-ingest.server";
+import { clawbotIngestHandler, clawbotWebhookHandler } from "./lib/server/xms-bot.server";
+import { serveFortuneHistory } from "./lib/server/xms-fortune-history.server";
+import { readSavedResult, readSharedResult } from "./lib/server/xms-fortune-result.server";
 import {
+  buildPastLifeShareSvg,
+  getPastLifeResultByShareToken,
+} from "./lib/server/xms-past-life.server";
+import {
+  handleAdminRequest,
   handleBufPayCallback,
   handleMockPaymentSuccess,
-  handleAdminRequest,
 } from "./lib/server/xms-payment.server";
-import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
-import {
-  getPastLifeResultByShareToken,
-  buildPastLifeShareSvg,
-} from "./lib/server/xms-past-life.server";
+import { logEvent } from "./lib/server/xms-store.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -29,8 +33,6 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -57,6 +59,8 @@ export default {
       }
 
       if (url.pathname === "/api/bot/clawbot/ingest" && request.method === "POST") {
+        const reportResponse = await maybeClawbotReportIngestHandler(request, env);
+        if (reportResponse) return reportResponse;
         return clawbotIngestHandler(request, env);
       }
 
@@ -78,6 +82,18 @@ export default {
 
       if (url.pathname.startsWith("/api/share/past-life-card/") && url.pathname.endsWith(".svg")) {
         return servePastLifeSvg(request, env);
+      }
+
+      if (url.pathname === "/history") {
+        return serveFortuneHistory(request, env);
+      }
+
+      if (url.pathname.startsWith("/r/")) {
+        return serveFortuneReport(request, env);
+      }
+
+      if (url.pathname.startsWith("/share/result/")) {
+        return serveSharedFortuneReport(request, env);
       }
 
       const handler = await getServerEntry();
@@ -149,5 +165,36 @@ async function servePastLifeSvg(request: Request, env: CloudflareBindings) {
       "Content-Type": "image/svg+xml; charset=utf-8",
       "Cache-Control": "public, max-age=3600",
     },
+  });
+}
+
+async function serveFortuneReport(request: Request, env: CloudflareBindings) {
+  const url = new URL(request.url);
+  const id = decodeURIComponent(url.pathname.replace("/r/", ""));
+  if (!id) return new Response("Not found", { status: 404 });
+  const result = await readSavedResult(env, id);
+  if (!result) return new Response("Not found", { status: 404 });
+  const html =
+    result.html || renderFallbackReport({ title: result.title, summary: result.summary });
+  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+async function serveSharedFortuneReport(request: Request, env: CloudflareBindings) {
+  const url = new URL(request.url);
+  const token = decodeURIComponent(url.pathname.replace("/share/result/", ""));
+  if (!token) return new Response("Not found", { status: 404 });
+  const result = await readSharedResult(env, token);
+  if (!result) return new Response("Not found", { status: 404 });
+  const html = [
+    '<article class="xms-report">',
+    `<h1>${escapeHtml(result.title)}</h1>`,
+    "<section><h2>Summary</h2>",
+    `<p>${escapeHtml(result.summary)}</p></section>`,
+    "</article>",
+  ].join("");
+  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
+    headers: { "content-type": "text/html; charset=utf-8" },
   });
 }
