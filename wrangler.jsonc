@@ -29,7 +29,6 @@
     "CF_ACCOUNT_ID": "ff431aed46e94b0593b8b1ee48842c7a",
     "CF_AI_GATEWAY_ID": "xms-dialogue-game",
     "DEEPSEEK_CHAT_MODEL": "deepseek-v4-flash",
-    "DEEPSEEK_REPORT_MODEL": "deepseek-v4-pro",
     "VAPID_PUBLIC_KEY": "",
   },
   "d1_databases": [
