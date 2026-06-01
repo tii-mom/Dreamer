@@ -105,7 +105,64 @@ export async function handleBotMessage(
   content: string,
   rawPayload: unknown,
 ): Promise<string> {
-  // 1. Get or create binding & user
+  const text = content.trim();
+
+  // 1. Check for bind code command BEFORE creating any binding
+  const bindMatch = text.match(/(?:绑定|bind|起运)\s*([A-Z0-9]{6,12})/i);
+  if (bindMatch) {
+    const bindCode = bindMatch[1].toUpperCase();
+    const bindResult = await bindClawbotUserByCode(env, {
+      bindCode,
+      providerUserId,
+    });
+
+    // Look up the user (may have been created during bind, or pre-existing)
+    const binding = await getBindingByProviderUser(env, "clawbot", providerUserId);
+    const user = binding ? await getUser(env, binding.userId) : null;
+    const userId = user?.id || bindResult.userId || "unknown";
+    const bindingId = binding?.id || bindResult.bindingId || "unknown";
+
+    const incomingId = `msg_in_${crypto.randomUUID().slice(0, 8)}`;
+    const outgoingId = `msg_out_${crypto.randomUUID().slice(0, 8)}`;
+    let reply = "";
+    if (bindResult.ok) {
+      reply =
+        `绑定成功。戏命师已入驻你的微信。\n` +
+        `现在可以发送：\n` +
+        `1 八字起盘\n` +
+        `2 今日问事\n` +
+        `3 解封命盘\n` +
+        `4 开盲盒`;
+    } else {
+      reply = bindResult.reason || "绑定码无效或已过期，请回到网页重新生成。";
+    }
+
+    await logBotMessage(env, {
+      id: incomingId,
+      userId,
+      bindingId,
+      channel: "clawbot",
+      direction: "in",
+      messageType: "text",
+      content: text,
+      intent: "bind",
+      rawJson: JSON.stringify(rawPayload),
+    });
+    await logBotMessage(env, {
+      id: outgoingId,
+      userId,
+      bindingId,
+      channel: "clawbot",
+      direction: "out",
+      messageType: "text",
+      content: reply,
+      intent: "bind",
+      rawJson: JSON.stringify({ bindResult }),
+    });
+    return reply;
+  }
+
+  // 2. Get or create binding & user (for non-bind messages)
   let binding = await getBindingByProviderUser(env, "clawbot", providerUserId);
   let user = binding ? await getUser(env, binding.userId) : null;
 
@@ -126,59 +183,10 @@ export async function handleBotMessage(
     await createWechatBinding(env, binding);
   }
 
-  // 2. Persist incoming message
+  // 3. Persist incoming message
   const incomingId = `msg_in_${crypto.randomUUID().slice(0, 8)}`;
-  const text = content.trim();
 
-  // 2.5 Check for bind code command
-  const bindMatch = text.match(/(?:绑定|bind|起运)\s*([A-Z0-9]{6,12})/i);
-  if (bindMatch) {
-    const bindCode = bindMatch[1].toUpperCase();
-    const bindResult = await bindClawbotUserByCode(env, {
-      bindCode,
-      providerUserId,
-    });
-
-    const outgoingId = `msg_out_${crypto.randomUUID().slice(0, 8)}`;
-    let reply = "";
-    if (bindResult.ok) {
-      reply =
-        `绑定成功。戏命师已入驻你的微信。\n` +
-        `现在可以发送：\n` +
-        `1 八字起盘\n` +
-        `2 今日问事\n` +
-        `3 解封命盘\n` +
-        `4 开盲盒`;
-    } else {
-      reply = bindResult.reason || "绑定码无效或已过期，请回到网页重新生成。";
-    }
-
-    await logBotMessage(env, {
-      id: incomingId,
-      userId: user.id,
-      bindingId: binding.id,
-      channel: "clawbot",
-      direction: "in",
-      messageType: "text",
-      content: text,
-      intent: "bind",
-      rawJson: JSON.stringify(rawPayload),
-    });
-    await logBotMessage(env, {
-      id: outgoingId,
-      userId: user.id,
-      bindingId: binding.id,
-      channel: "clawbot",
-      direction: "out",
-      messageType: "text",
-      content: reply,
-      intent: "bind",
-      rawJson: JSON.stringify({ bindResult }),
-    });
-    return reply;
-  }
-
-  // 3. Check if operator
+  // 4. Check if operator
   const db = env.DB;
   let isOperator = false;
   if (db) {

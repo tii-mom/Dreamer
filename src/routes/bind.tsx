@@ -37,7 +37,8 @@ function BindWechat() {
     setExpired(false);
 
     try {
-      const refCode = new URLSearchParams(window.location.search).get("ref") || undefined;
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get("ref") || undefined;
 
       const result = await createClawbotBindTicket({
         data: {

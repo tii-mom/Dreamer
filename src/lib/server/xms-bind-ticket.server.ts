@@ -192,6 +192,40 @@ export async function queryBindTicketStatus(
   };
 }
 
+async function markTicketBound(
+  env: CloudflareBindings,
+  ticket: BotBindTicket,
+  providerUserId: string,
+): Promise<void> {
+  const db = env.DB;
+  const boundAt = nowIso();
+  if (!db) {
+    const stored = devStore().botBindTickets.get(ticket.id) as unknown as BotBindTicket | undefined;
+    if (stored) {
+      stored.status = "bound";
+      stored.providerUserId = providerUserId;
+      stored.boundAt = boundAt;
+      stored.rawJson = (stored.rawJson || "") + `|bound:${providerUserId}`;
+      devStore().botBindTickets.set(stored.id, stored as unknown as Record<string, unknown>);
+      devStore().botBindTickets.set(
+        `code:${stored.bindCode}`,
+        stored as unknown as Record<string, unknown>,
+      );
+      devStore().botBindTickets.set(
+        `ticket:${stored.ticket}`,
+        stored as unknown as Record<string, unknown>,
+      );
+    }
+    return;
+  }
+  await db
+    .prepare(
+      "UPDATE bot_bind_tickets SET status = 'bound', provider_user_id = ?, bound_at = ?, updated_at = (datetime('now')) WHERE id = ?",
+    )
+    .bind(providerUserId, boundAt, ticket.id)
+    .run();
+}
+
 async function expireBindTicket(env: CloudflareBindings, id: string): Promise<void> {
   const db = env.DB;
   if (!db) {
@@ -199,7 +233,15 @@ async function expireBindTicket(env: CloudflareBindings, id: string): Promise<vo
     if (stored) {
       stored.status = "expired";
       stored.rawJson = (stored.rawJson || "") + `|expired_at:${nowIso()}`;
-      devStore().botBindTickets.set(id, stored as unknown as Record<string, unknown>);
+      devStore().botBindTickets.set(stored.id, stored as unknown as Record<string, unknown>);
+      devStore().botBindTickets.set(
+        `code:${stored.bindCode}`,
+        stored as unknown as Record<string, unknown>,
+      );
+      devStore().botBindTickets.set(
+        `ticket:${stored.ticket}`,
+        stored as unknown as Record<string, unknown>,
+      );
     }
     return;
   }
@@ -236,21 +278,28 @@ export async function bindClawbotUserByCode(
     return { ok: false, reason: ticket.status === "bound" ? "绑定码已被使用" : "绑定码已失效" };
   }
 
+  // Ticket must have a userId to bind
+  if (!ticket.userId) {
+    return { ok: false, reason: "绑定票缺少用户信息，请回到网页重新生成绑定码" };
+  }
+
   // Check if this providerUserId is already bound to another user
   const { getBindingByProviderUser } = await import("./xms-wechat.server");
   const existingBinding = await getBindingByProviderUser(env, "clawbot", input.providerUserId);
   if (existingBinding) {
-    if (ticket.userId && existingBinding.userId !== ticket.userId) {
+    if (existingBinding.userId !== ticket.userId) {
       return { ok: false, reason: "该微信已绑定其他戏命师账户，请联系客服处理" };
     }
-    // Same user re-binding — allow
+    // Same user already bound — skip re-creating the binding, just mark ticket
+    await markTicketBound(env, ticket, input.providerUserId);
+    return { ok: true, userId: ticket.userId, bindingId: existingBinding.id };
   }
 
-  const bindingId = `bin_${randomId("").replace("_", "")}`;
+  const bindingId = `bin_${crypto.randomUUID().slice(0, 8)}`;
   const { createWechatBinding } = await import("./xms-wechat.server");
   await createWechatBinding(env, {
     id: bindingId,
-    userId: ticket.userId || "",
+    userId: ticket.userId,
     provider: "clawbot",
     providerUserId: input.providerUserId,
     status: "active",
@@ -290,26 +339,9 @@ export async function bindClawbotUserByCode(
   }
 
   // Mark ticket as bound
-  const db = env.DB;
-  const boundAt = nowIso();
-  if (!db) {
-    const stored = devStore().botBindTickets.get(ticket.id) as unknown as BotBindTicket | undefined;
-    if (stored) {
-      stored.status = "bound";
-      stored.providerUserId = input.providerUserId;
-      stored.boundAt = boundAt;
-      stored.rawJson = (stored.rawJson || "") + `|bound:${input.providerUserId}`;
-    }
-  } else {
-    await db
-      .prepare(
-        "UPDATE bot_bind_tickets SET status = 'bound', provider_user_id = ?, bound_at = ?, updated_at = (datetime('now')) WHERE id = ?",
-      )
-      .bind(input.providerUserId, boundAt, ticket.id)
-      .run();
-  }
+  await markTicketBound(env, ticket, input.providerUserId);
 
-  return { ok: true, userId: ticket.userId || undefined, bindingId };
+  return { ok: true, userId: ticket.userId, bindingId };
 }
 
 export async function expireOldBindTickets(env: CloudflareBindings): Promise<void> {
@@ -321,7 +353,15 @@ export async function expireOldBindTickets(env: CloudflareBindings): Promise<voi
       if (t.status === "pending" && new Date(t.expiresAt).getTime() < Date.now()) {
         t.status = "expired";
         t.rawJson = (t.rawJson || "") + `|expired_at:${nowIso()}`;
-        devStore().botBindTickets.set(key, t as unknown as Record<string, unknown>);
+        devStore().botBindTickets.set(t.id, t as unknown as Record<string, unknown>);
+        devStore().botBindTickets.set(
+          `code:${t.bindCode}`,
+          t as unknown as Record<string, unknown>,
+        );
+        devStore().botBindTickets.set(
+          `ticket:${t.ticket}`,
+          t as unknown as Record<string, unknown>,
+        );
       }
     }
     return;
