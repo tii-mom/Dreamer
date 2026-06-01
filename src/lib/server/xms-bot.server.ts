@@ -6,6 +6,9 @@ import {
 import {
   getUser,
   createUser,
+  getBirthProfile,
+  saveBirthProfileRecord,
+  updateUser,
   devStore,
   nowIso,
   todayKey,
@@ -18,6 +21,12 @@ import { parseIntent, isMenuRequest, setMenuSession } from "@/lib/bot/command-pa
 import { renderMenu } from "@/lib/bot/render-menu";
 import type { BotIntent } from "@/lib/bot/actions";
 import { createBotTicket } from "./xms-ticket.server";
+import {
+  isBirthText,
+  parseBirthProfileFromText,
+  saveOrUpdateUserChart,
+  getOrCreateUserChart,
+} from "./xms-chart.server";
 
 export type BotMessage = {
   id: string;
@@ -209,7 +218,8 @@ export async function handleBotMessage(
         `气运：${user.qiyun}\n` +
         `级别：${user.level}\n` +
         `命盘状态：${user.sealUnlocked}% 解封\n` +
-        `经营者：${user.shopOpen ? "已激活" : "未开通"}\n\n` +
+        `经营者：${user.shopOpen ? "已激活" : "未开通"}\n` +
+        `命盘：${user.sealUnlocked >= 100 ? "已起盘" : "未补全出生时辰"}\n\n` +
         `绑定恢复码：${user.recoveryCode}\n(请妥善保存，在网页端输入可同步此微信数据)`;
       break;
 
@@ -290,10 +300,33 @@ export async function handleBotMessage(
 
     default: {
       try {
+        // Handle birth info if present
+        let bp = await getBirthProfile(env, user.id);
+
+        if (isBirthText(text)) {
+          const parsed = parseBirthProfileFromText(text);
+          if (parsed) {
+            bp = await saveBirthProfileRecord(env, user.id, parsed);
+            try {
+              await saveOrUpdateUserChart(env, user.id, parsed);
+            } catch {
+              // Missing birth time is OK
+            }
+            user = await updateUser(env, {
+              ...user,
+              sealUnlocked: Math.max(user.sealUnlocked, 30),
+              chartGlow: Math.max(user.chartGlow, 38),
+            });
+          }
+        }
+
+        const chartContext = await getOrCreateUserChart(env, user.id, bp);
+
         const aiRes = await generateMasterReply({
           env,
           user,
-          birthProfile: null,
+          birthProfile: bp,
+          chartPromptSummary: chartContext.promptSummary,
           daily,
           history: [],
           userText: text,

@@ -154,3 +154,27 @@ export function resolveDrawResultInfo(result: { assetCode: string }) {
   const catalogItem = ASSET_CATALOG.find((a) => a.assetCode === result.assetCode);
   return catalogItem ?? null;
 }
+
+/**
+ * Get the latest draw ID for a given payment.
+ */
+export async function getLatestDrawIdByPayment(
+  env: CloudflareBindings,
+  paymentId: string,
+): Promise<string | null> {
+  const db = env.DB;
+  if (!db) {
+    for (const draw of devStore().blindboxDraws.values()) {
+      const d = draw as unknown as BoxDrawRecord;
+      if (d.paymentId === paymentId) return d.id;
+    }
+    return null;
+  }
+
+  const row = await db
+    .prepare("SELECT id FROM blindbox_draws WHERE payment_id = ? ORDER BY created_at DESC LIMIT 1")
+    .bind(paymentId)
+    .first<{ id: string }>();
+
+  return row?.id ?? null;
+}

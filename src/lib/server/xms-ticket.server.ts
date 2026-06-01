@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { nowIso } from "./xms-store.server";
+import { nowIso, devStore } from "./xms-store.server";
 
 export type BotTicketInput = {
   userId: string;
@@ -73,6 +73,8 @@ export async function createBotTicket(
         record.expiresAt,
       )
       .run();
+  } else {
+    devStore().botTickets.set(record.ticket, record as unknown as Record<string, unknown>);
   }
 
   return record;
@@ -122,7 +124,11 @@ export async function consumeBotTicket(
   }
 
   // Memory store fallback
-  return null;
+  const stored = devStore().botTickets.get(ticket) as unknown as BotTicket | undefined;
+  if (!stored) return null;
+  if (new Date(stored.expiresAt).getTime() < Date.now()) return null;
+  if (stored.usedAt) return null;
+  return stored;
 }
 
 /**

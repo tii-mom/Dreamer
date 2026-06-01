@@ -29,6 +29,13 @@ import {
   getPaymentByAoid,
 } from "./xms-store.server";
 import { generateMasterReply } from "./xms-ai.server";
+import {
+  isBirthText as isBirthTextImport,
+  parseBirthProfileFromText,
+  saveOrUpdateUserChart,
+  getOrCreateUserChart,
+} from "./xms-chart.server";
+const isBirthText = isBirthTextImport;
 import type {
   AppBootstrap,
   BirthProfile,
@@ -84,28 +91,6 @@ function onboardingMessages(user: UserProfile): ChatMsg[] {
       createdAt: nowIso(),
     },
   ];
-}
-
-function isBirthText(text: string) {
-  return /([12][0-9]{3}).{0,8}([01]?[0-9]).{0,4}([0-3]?[0-9])|出生|生日|八字|阳历|阴历|农历/.test(
-    text,
-  );
-}
-
-function profileFromText(text: string): BirthProfile | null {
-  const match = text.match(
-    /([12][0-9]{3})\D+([01]?[0-9])\D+([0-3]?[0-9])(?:\D+([0-2]?[0-9])\D*(?:点|时)?)?/,
-  );
-  if (!match) return null;
-  const [, year, month, day, hour] = match;
-  const date = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-  return {
-    calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
-    birthDate: date,
-    birthTime: hour ? `${hour.padStart(2, "0")}:00` : undefined,
-    gender: "unknown",
-    rawText: text,
-  };
 }
 
 function cardForTopic(
@@ -230,20 +215,32 @@ export async function handleUserMessage(
 
   let user = bootstrap.user;
   let birthProfile = bootstrap.birthProfile;
+
+  // Handle birth info input → generate chart
   if (!birthProfile && isBirthText(text)) {
-    birthProfile = profileFromText(text) ?? {
+    const parsed = parseBirthProfileFromText(text) ?? {
       calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
       birthDate: todayKey(),
       gender: "unknown",
       rawText: text,
     };
-    await saveBirthProfileRecord(env, user.id, birthProfile);
+    await saveBirthProfileRecord(env, user.id, parsed);
+    birthProfile = parsed;
+    // Generate chart if birth time is available
+    try {
+      await saveOrUpdateUserChart(env, user.id, parsed);
+    } catch {
+      // Chart generation failed (likely missing birth time) — that's OK
+    }
     user = await updateUser(env, {
       ...user,
       sealUnlocked: Math.max(user.sealUnlocked, 30),
       chartGlow: Math.max(user.chartGlow, 38),
     });
   }
+
+  // Get or create chart for prompt context
+  const chartContext = await getOrCreateUserChart(env, user.id, birthProfile);
 
   let daily = await getOrCreateDailyState(env, user);
   const consumesAsk = !/恢复码|分享|生成分享|出马申请/.test(text);
@@ -259,6 +256,7 @@ export async function handleUserMessage(
     env,
     user,
     birthProfile,
+    chartPromptSummary: chartContext.promptSummary,
     daily,
     history,
     userText: text,
@@ -314,6 +312,12 @@ export async function saveBirthProfile(
     sealUnlocked: 30,
     chartGlow: Math.max(bootstrap.user.chartGlow, 40),
   });
+  // Generate chart if possible
+  try {
+    await saveOrUpdateUserChart(env, user.id, profile);
+  } catch {
+    // Ignore chart errors (e.g. missing birth time)
+  }
   await logEvent(env, user.id, "birth_profile_saved", { calendarType: profile.calendarType });
   return { user, birthProfile: saved };
 }
@@ -689,5 +693,19 @@ export async function queryPaymentStatusService(
 
   // Refetch to return latest local status
   const current = await getPaymentByOrderId(env, input.orderId);
-  return { status: current?.status || payment.status, priceCents: payment.priceCents };
+
+  // Look up latest blindbox drawId for this order
+  let latestDrawId: string | null = null;
+  if (current && (current.status === "success" || current.status === "mock_success")) {
+    if (current.productCode === "blindbox_single" || current.productCode === "blindbox_ten") {
+      const { getLatestDrawIdByPayment } = await import("./xms-blindbox-draw.server");
+      latestDrawId = await getLatestDrawIdByPayment(env, current.id);
+    }
+  }
+
+  return {
+    status: current?.status || payment.status,
+    priceCents: payment.priceCents,
+    latestDrawId,
+  };
 }

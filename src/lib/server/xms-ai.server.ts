@@ -8,6 +8,7 @@ type GenerateReplyInput = {
   env: CloudflareBindings;
   user: UserProfile;
   birthProfile: BirthProfile | null;
+  chartPromptSummary?: string | null;
   daily: DailyState;
   history: ChatMsg[];
   userText: string;
@@ -27,6 +28,10 @@ const SYSTEM_PROMPT = `
 - 每次 3-5 句话，移动端好读。
 - 先给一个有用判断，再给一个具体行动，再埋一个转化钩子。
 - 结合用户本命资料、今日流日和历史对话；没有资料就催用户报八字。
+- 如果存在"结构化紫微命盘摘要"，必须优先依据摘要解读。
+- 不允许编造命盘里没有出现的星曜、宫位、四化、格局。
+- DeepSeek 负责戏命师口吻表达，本地命盘摘要负责底层判断。
+- 如果没有完整时辰或没有命盘摘要，应提示用户补全出生时辰，不要假装已排完整命盘。
 `;
 
 function fallbackReply(input: GenerateReplyInput) {
@@ -98,8 +103,11 @@ export async function generateMasterReply(input: GenerateReplyInput) {
   }
 
   const profileLine = input.birthProfile
-    ? `用户八字资料：${input.birthProfile.rawText || `${input.birthProfile.birthDate} ${input.birthProfile.birthTime ?? ""}`}`
+    ? `用户出生资料：${input.birthProfile.rawText || `${input.birthProfile.birthDate} ${input.birthProfile.birthTime ?? ""}`}`
     : "用户尚未完整提交出生资料。";
+  const chartLine = input.chartPromptSummary
+    ? `结构化紫微命盘摘要：\n${input.chartPromptSummary}`
+    : "暂未生成完整紫微命盘摘要；若用户未提供出生时辰，请引导补全。";
   const dailyLine = `今日流日：${input.daily.fortune.title}；吉时 ${input.daily.fortune.luckyHour}；财神方位 ${input.daily.fortune.direction}；忌 ${input.daily.fortune.avoid}。`;
 
   // Load equipped inscription context
@@ -124,7 +132,7 @@ export async function generateMasterReply(input: GenerateReplyInput) {
             { role: "system", content: SYSTEM_PROMPT },
             {
               role: "system",
-              content: `${profileLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。${inscriptionLine}`,
+              content: `${profileLine}\n${chartLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。${inscriptionLine}`,
             },
             ...compactHistory(input.history),
             { role: "user", content: input.userText },
