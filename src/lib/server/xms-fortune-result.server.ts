@@ -80,7 +80,9 @@ export async function createSavedResult(
     return result;
   }
 
-  await env.DB.prepare("INSERT INTO fortune_results (id,user_id,kind,title,summary,html,data_json,share_token,model,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+  await env.DB.prepare(
+    "INSERT INTO fortune_results (id,user_id,kind,title,summary,html,data_json,share_token,model,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+  )
     .bind(
       id,
       input.userId,
@@ -106,7 +108,9 @@ export async function listSavedResults(env: CloudflareBindings, userId: string) 
       .slice(0, 50);
   }
 
-  const rows = await env.DB.prepare("SELECT * FROM fortune_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 50")
+  const rows = await env.DB.prepare(
+    "SELECT * FROM fortune_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 50",
+  )
     .bind(userId)
     .all<Record<string, unknown>>();
   return (rows.results ?? []).map(mapFortuneResultRow);
