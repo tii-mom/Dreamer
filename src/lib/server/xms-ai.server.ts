@@ -1,4 +1,5 @@
 import type { BirthProfile, ChatMsg, DailyState, UserProfile } from "../domain";
+import type { MasterAgentMemory, MasterAgentRecord } from "./xms-master-agent.server";
 import { getEquippedInscriptions } from "./xms-blindbox.server";
 import { resolveDrawResultInfo } from "./xms-blindbox-draw.server";
 import { getUserAssets } from "./xms-blindbox.server";
@@ -12,6 +13,8 @@ type GenerateReplyInput = {
   daily: DailyState;
   history: ChatMsg[];
   userText: string;
+  masterAgent?: MasterAgentRecord;
+  agentMemories?: MasterAgentMemory[];
 };
 
 const SYSTEM_PROMPT = `
@@ -62,6 +65,27 @@ function compactHistory(messages: ChatMsg[]) {
     }));
 }
 
+function buildAgentPrompt(agent?: MasterAgentRecord, memories: MasterAgentMemory[] = []) {
+  if (!agent) return "";
+
+  const persona = agent.persona;
+  const constraints = agent.constraints;
+  const memoryLines = memories.map((memory) => `- ${memory.memoryType}: ${memory.content}`);
+
+  return [
+    `当前 active master agent：${agent.displayName} (${agent.agentCode})`,
+    `Agent 人设：${persona.name}；语气：${persona.tone}；风格：${persona.style}`,
+    persona.catchphrases.length ? `口头禅参考：${persona.catchphrases.join(" / ")}` : "",
+    `Agent 技能：${agent.skills.join(", ")}`,
+    `Agent 约束：不做医疗诊断=${constraints.noMedicalDiagnosis}；不承诺金融收益=${constraints.noFinancialGuarantee}；不做政治动员=${constraints.noPoliticalMobilization}；最长回复=${constraints.maxReplyLength}字。`,
+    memoryLines.length
+      ? `Agent 已记住的关键事实：\n${memoryLines.join("\n")}`
+      : "Agent 暂无长期记忆摘要。",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 async function getInscriptionPrompt(env: CloudflareBindings, userId: string): Promise<string> {
   try {
     const equipped = await getEquippedInscriptions(env, userId);
@@ -109,6 +133,7 @@ export async function generateMasterReply(input: GenerateReplyInput) {
     ? `结构化紫微命盘摘要：\n${input.chartPromptSummary}`
     : "暂未生成完整紫微命盘摘要；若用户未提供出生时辰，请引导补全。";
   const dailyLine = `今日流日：${input.daily.fortune.title}；吉时 ${input.daily.fortune.luckyHour}；财神方位 ${input.daily.fortune.direction}；忌 ${input.daily.fortune.avoid}。`;
+  const agentLine = buildAgentPrompt(input.masterAgent, input.agentMemories ?? []);
 
   // Load equipped inscription context
   const inscriptionLine = await getInscriptionPrompt(input.env, input.user.id);
@@ -132,7 +157,7 @@ export async function generateMasterReply(input: GenerateReplyInput) {
             { role: "system", content: SYSTEM_PROMPT },
             {
               role: "system",
-              content: `${profileLine}\n${chartLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。${inscriptionLine}`,
+              content: `${agentLine}\n${profileLine}\n${chartLine}\n${dailyLine}\n用户等级：${input.user.level}；连续问安：${input.user.streak}日；命盘亮度：${input.user.chartGlow}。${inscriptionLine}`,
             },
             ...compactHistory(input.history),
             { role: "user", content: input.userText },

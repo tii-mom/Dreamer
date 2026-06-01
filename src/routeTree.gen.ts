@@ -13,6 +13,7 @@ import { Route as TryRouteImport } from './routes/try'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PastLifeRouteImport } from './routes/past-life'
 import { Route as OperatorRouteImport } from './routes/operator'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as BlindboxRouteImport } from './routes/blindbox'
@@ -21,6 +22,7 @@ import { Route as AssetsRouteImport } from './routes/assets'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WxPayRouteImport } from './routes/wx.pay'
+import { Route as WxPastLifeRouteImport } from './routes/wx.past-life'
 import { Route as WxOperatorRouteImport } from './routes/wx.operator'
 import { Route as WxHomeRouteImport } from './routes/wx.home'
 import { Route as WxBlindboxRouteImport } from './routes/wx.blindbox'
@@ -30,6 +32,7 @@ import { Route as OperatorPayRouteImport } from './routes/operator.pay'
 import { Route as OperatorDashboardRouteImport } from './routes/operator.dashboard'
 import { Route as BindSuccessRouteImport } from './routes/bind.success'
 import { Route as WxResultDrawIdRouteImport } from './routes/wx.result.$drawId'
+import { Route as PastLifeShareShareTokenRouteImport } from './routes/past-life.share.$shareToken'
 import { Route as BlindboxResultDrawIdRouteImport } from './routes/blindbox.result.$drawId'
 
 const TryRoute = TryRouteImport.update({
@@ -50,6 +53,11 @@ const RefundRoute = RefundRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PastLifeRoute = PastLifeRouteImport.update({
+  id: '/past-life',
+  path: '/past-life',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OperatorRoute = OperatorRouteImport.update({
@@ -90,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
 const WxPayRoute = WxPayRouteImport.update({
   id: '/wx/pay',
   path: '/wx/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WxPastLifeRoute = WxPastLifeRouteImport.update({
+  id: '/wx/past-life',
+  path: '/wx/past-life',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WxOperatorRoute = WxOperatorRouteImport.update({
@@ -137,6 +150,11 @@ const WxResultDrawIdRoute = WxResultDrawIdRouteImport.update({
   path: '/wx/result/$drawId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PastLifeShareShareTokenRoute = PastLifeShareShareTokenRouteImport.update({
+  id: '/share/$shareToken',
+  path: '/share/$shareToken',
+  getParentRoute: () => PastLifeRoute,
+} as any)
 const BlindboxResultDrawIdRoute = BlindboxResultDrawIdRouteImport.update({
   id: '/result/$drawId',
   path: '/result/$drawId',
@@ -151,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/blindbox': typeof BlindboxRouteWithChildren
   '/disclaimer': typeof DisclaimerRoute
   '/operator': typeof OperatorRouteWithChildren
+  '/past-life': typeof PastLifeRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/terms': typeof TermsRoute
@@ -163,8 +182,10 @@ export interface FileRoutesByFullPath {
   '/wx/blindbox': typeof WxBlindboxRoute
   '/wx/home': typeof WxHomeRoute
   '/wx/operator': typeof WxOperatorRoute
+  '/wx/past-life': typeof WxPastLifeRoute
   '/wx/pay': typeof WxPayRoute
   '/blindbox/result/$drawId': typeof BlindboxResultDrawIdRoute
+  '/past-life/share/$shareToken': typeof PastLifeShareShareTokenRoute
   '/wx/result/$drawId': typeof WxResultDrawIdRoute
 }
 export interface FileRoutesByTo {
@@ -175,6 +196,7 @@ export interface FileRoutesByTo {
   '/blindbox': typeof BlindboxRouteWithChildren
   '/disclaimer': typeof DisclaimerRoute
   '/operator': typeof OperatorRouteWithChildren
+  '/past-life': typeof PastLifeRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/terms': typeof TermsRoute
@@ -187,8 +209,10 @@ export interface FileRoutesByTo {
   '/wx/blindbox': typeof WxBlindboxRoute
   '/wx/home': typeof WxHomeRoute
   '/wx/operator': typeof WxOperatorRoute
+  '/wx/past-life': typeof WxPastLifeRoute
   '/wx/pay': typeof WxPayRoute
   '/blindbox/result/$drawId': typeof BlindboxResultDrawIdRoute
+  '/past-life/share/$shareToken': typeof PastLifeShareShareTokenRoute
   '/wx/result/$drawId': typeof WxResultDrawIdRoute
 }
 export interface FileRoutesById {
@@ -200,6 +224,7 @@ export interface FileRoutesById {
   '/blindbox': typeof BlindboxRouteWithChildren
   '/disclaimer': typeof DisclaimerRoute
   '/operator': typeof OperatorRouteWithChildren
+  '/past-life': typeof PastLifeRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/terms': typeof TermsRoute
@@ -212,8 +237,10 @@ export interface FileRoutesById {
   '/wx/blindbox': typeof WxBlindboxRoute
   '/wx/home': typeof WxHomeRoute
   '/wx/operator': typeof WxOperatorRoute
+  '/wx/past-life': typeof WxPastLifeRoute
   '/wx/pay': typeof WxPayRoute
   '/blindbox/result/$drawId': typeof BlindboxResultDrawIdRoute
+  '/past-life/share/$shareToken': typeof PastLifeShareShareTokenRoute
   '/wx/result/$drawId': typeof WxResultDrawIdRoute
 }
 export interface FileRouteTypes {
@@ -226,6 +253,7 @@ export interface FileRouteTypes {
     | '/blindbox'
     | '/disclaimer'
     | '/operator'
+    | '/past-life'
     | '/privacy'
     | '/refund'
     | '/terms'
@@ -238,8 +266,10 @@ export interface FileRouteTypes {
     | '/wx/blindbox'
     | '/wx/home'
     | '/wx/operator'
+    | '/wx/past-life'
     | '/wx/pay'
     | '/blindbox/result/$drawId'
+    | '/past-life/share/$shareToken'
     | '/wx/result/$drawId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -250,6 +280,7 @@ export interface FileRouteTypes {
     | '/blindbox'
     | '/disclaimer'
     | '/operator'
+    | '/past-life'
     | '/privacy'
     | '/refund'
     | '/terms'
@@ -262,8 +293,10 @@ export interface FileRouteTypes {
     | '/wx/blindbox'
     | '/wx/home'
     | '/wx/operator'
+    | '/wx/past-life'
     | '/wx/pay'
     | '/blindbox/result/$drawId'
+    | '/past-life/share/$shareToken'
     | '/wx/result/$drawId'
   id:
     | '__root__'
@@ -274,6 +307,7 @@ export interface FileRouteTypes {
     | '/blindbox'
     | '/disclaimer'
     | '/operator'
+    | '/past-life'
     | '/privacy'
     | '/refund'
     | '/terms'
@@ -286,8 +320,10 @@ export interface FileRouteTypes {
     | '/wx/blindbox'
     | '/wx/home'
     | '/wx/operator'
+    | '/wx/past-life'
     | '/wx/pay'
     | '/blindbox/result/$drawId'
+    | '/past-life/share/$shareToken'
     | '/wx/result/$drawId'
   fileRoutesById: FileRoutesById
 }
@@ -299,6 +335,7 @@ export interface RootRouteChildren {
   BlindboxRoute: typeof BlindboxRouteWithChildren
   DisclaimerRoute: typeof DisclaimerRoute
   OperatorRoute: typeof OperatorRouteWithChildren
+  PastLifeRoute: typeof PastLifeRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
   TermsRoute: typeof TermsRoute
@@ -308,6 +345,7 @@ export interface RootRouteChildren {
   WxBlindboxRoute: typeof WxBlindboxRoute
   WxHomeRoute: typeof WxHomeRoute
   WxOperatorRoute: typeof WxOperatorRoute
+  WxPastLifeRoute: typeof WxPastLifeRoute
   WxPayRoute: typeof WxPayRoute
   WxResultDrawIdRoute: typeof WxResultDrawIdRoute
 }
@@ -340,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/past-life': {
+      id: '/past-life'
+      path: '/past-life'
+      fullPath: '/past-life'
+      preLoaderRoute: typeof PastLifeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/operator': {
@@ -396,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/wx/pay'
       fullPath: '/wx/pay'
       preLoaderRoute: typeof WxPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wx/past-life': {
+      id: '/wx/past-life'
+      path: '/wx/past-life'
+      fullPath: '/wx/past-life'
+      preLoaderRoute: typeof WxPastLifeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wx/operator': {
@@ -461,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WxResultDrawIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/past-life/share/$shareToken': {
+      id: '/past-life/share/$shareToken'
+      path: '/share/$shareToken'
+      fullPath: '/past-life/share/$shareToken'
+      preLoaderRoute: typeof PastLifeShareShareTokenRouteImport
+      parentRoute: typeof PastLifeRoute
+    }
     '/blindbox/result/$drawId': {
       id: '/blindbox/result/$drawId'
       path: '/result/$drawId'
@@ -507,6 +566,18 @@ const OperatorRouteWithChildren = OperatorRoute._addFileChildren(
   OperatorRouteChildren,
 )
 
+interface PastLifeRouteChildren {
+  PastLifeShareShareTokenRoute: typeof PastLifeShareShareTokenRoute
+}
+
+const PastLifeRouteChildren: PastLifeRouteChildren = {
+  PastLifeShareShareTokenRoute: PastLifeShareShareTokenRoute,
+}
+
+const PastLifeRouteWithChildren = PastLifeRoute._addFileChildren(
+  PastLifeRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -515,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlindboxRoute: BlindboxRouteWithChildren,
   DisclaimerRoute: DisclaimerRoute,
   OperatorRoute: OperatorRouteWithChildren,
+  PastLifeRoute: PastLifeRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
   TermsRoute: TermsRoute,
@@ -524,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   WxBlindboxRoute: WxBlindboxRoute,
   WxHomeRoute: WxHomeRoute,
   WxOperatorRoute: WxOperatorRoute,
+  WxPastLifeRoute: WxPastLifeRoute,
   WxPayRoute: WxPayRoute,
   WxResultDrawIdRoute: WxResultDrawIdRoute,
 }

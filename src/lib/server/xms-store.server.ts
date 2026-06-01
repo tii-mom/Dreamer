@@ -66,6 +66,10 @@ export type DevStore = {
   birthCharts: Map<string, Record<string, unknown>>;
   botTickets: Map<string, Record<string, unknown>>;
   botBindTickets: Map<string, Record<string, unknown>>;
+  masterAgents: Map<string, Record<string, unknown>>;
+  masterAgentMemories: Map<string, Record<string, unknown>>;
+  masterAgentSkillStates: Map<string, Record<string, unknown>>;
+  pastLifeResults: Map<string, Record<string, unknown>>;
 };
 
 export function devStore(): DevStore {
@@ -94,6 +98,10 @@ export function devStore(): DevStore {
       birthCharts: new Map(),
       botTickets: new Map(),
       botBindTickets: new Map(),
+      masterAgents: new Map(),
+      masterAgentMemories: new Map(),
+      masterAgentSkillStates: new Map(),
+      pastLifeResults: new Map(),
     };
   }
   return global.__xmsDevStore;
