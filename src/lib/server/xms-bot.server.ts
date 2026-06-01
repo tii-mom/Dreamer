@@ -29,6 +29,15 @@ import {
   getOrCreateUserChart,
 } from "./xms-chart.server";
 import { bindClawbotUserByCode } from "./xms-bind-ticket.server";
+import { getMasterAgentMemories, getOrCreateActiveMasterAgent } from "./xms-master-agent.server";
+import { getOrCreatePastLifeResult, buildPastLifeShareText } from "./xms-past-life.server";
+import {
+  getOrCreateUserChart,
+  isBirthText,
+  parseBirthProfileFromText,
+  saveBirthProfileRecord,
+  saveOrUpdateUserChart,
+} from "./xms-chart.server";
 
 export type BotMessage = {
   id: string;
@@ -169,7 +178,76 @@ export async function handleBotMessage(
     return reply;
   }
 
-  // 2. Get or create binding & user (for non-bind messages)
+  // 1.5 Check for past-life command
+  if (/^(前世|前世身份|生成分享卡)$/.test(text)) {
+    const bp = await getBirthProfile(env, binding ? binding.userId : user?.id);
+    const chartCtx = bp
+      ? await getOrCreateUserChart(env, (bp.userId as unknown as string) || user?.id, bp)
+      : null;
+
+    let reply = "";
+    if (!chartCtx?.chart) {
+      reply =
+        `想看前世身份，不能只给年月日。\n` +
+        `把出生年月日时补全，例如：\n` +
+        `1995-06-15 22:00 女\n\n` +
+        `缺时辰，我只能看见你前世的影子，看不见你当时到底是掌柜还是背锅侠。`;
+    } else {
+      const result = await getOrCreatePastLifeResult(
+        env,
+        binding ? binding.userId : user?.id || "unknown",
+        chartCtx.chart,
+      );
+
+      const baseUrl = env.APP_BASE_URL || "https://bige.life";
+      const shareUrl = `${baseUrl}/past-life/share/${result.shareToken}`;
+
+      // Check if user is an operator for referral link
+      let useReferral = false;
+      let referralCode = "";
+      const db = env.DB;
+      if (db) {
+        const op = await db
+          .prepare(
+            "SELECT referral_code FROM operators WHERE user_id = ? AND status = 'active' LIMIT 1",
+          )
+          .bind(binding ? binding.userId : user?.id)
+          .first<{ referral_code: string }>();
+        if (op) {
+          useReferral = true;
+          referralCode = op.referral_code;
+        }
+      } else {
+        for (const op of devStore().operators.values()) {
+          if (op.userId === (binding ? binding.userId : user?.id)) {
+            useReferral = true;
+            referralCode = op.referralCode;
+            break;
+          }
+        }
+      }
+
+      const finalUrl = useReferral
+        ? `${baseUrl}/s/${referralCode}?scene=past-life&share=${result.shareToken}`
+        : shareUrl;
+
+      reply = buildPastLifeShareText(result, finalUrl);
+    }
+
+    const outgoingId = `msg_out_${crypto.randomUUID().slice(0, 8)}`;
+    await logBotMessage(env, {
+      id: outgoingId,
+      userId: binding ? binding.userId : user?.id || "unknown",
+      bindingId: binding?.id || "unknown",
+      channel: "clawbot",
+      direction: "out",
+      messageType: "text",
+      content: reply,
+      intent: "chat",
+      rawJson: JSON.stringify({}),
+    });
+    return reply;
+  }
   let binding = await getBindingByProviderUser(env, "clawbot", providerUserId);
   let user = binding ? await getUser(env, binding.userId) : null;
 
@@ -396,6 +474,8 @@ export async function handleBotMessage(
         }
 
         const chartContext = await getOrCreateUserChart(env, user.id, bp);
+        const masterAgent = await getOrCreateActiveMasterAgent(env, user.id);
+        const agentMemories = await getMasterAgentMemories(env, masterAgent.id, user.id);
 
         const aiRes = await generateMasterReply({
           env,
@@ -405,6 +485,8 @@ export async function handleBotMessage(
           daily,
           history: [],
           userText: text,
+          masterAgent,
+          agentMemories,
         });
         replyText = aiRes.text;
       } catch (err) {

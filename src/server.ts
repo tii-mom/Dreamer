@@ -9,6 +9,10 @@ import {
   handleAdminRequest,
 } from "./lib/server/xms-payment.server";
 import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
+import {
+  getPastLifeResultByShareToken,
+  buildPastLifeShareSvg,
+} from "./lib/server/xms-past-life.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -72,6 +76,10 @@ export default {
         return serveR2Asset(request, env);
       }
 
+      if (url.pathname.startsWith("/api/share/past-life-card/") && url.pathname.endsWith(".svg")) {
+        return servePastLifeSvg(request, env);
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, {
         context: {
@@ -119,4 +127,27 @@ async function serveR2Asset(request: Request, env: CloudflareBindings) {
   headers.set("etag", object.httpEtag);
   headers.set("cache-control", "public, max-age=31536000, immutable");
   return new Response(object.body, { headers });
+}
+
+async function servePastLifeSvg(request: Request, env: CloudflareBindings) {
+  const url = new URL(request.url);
+  const token = url.pathname.replace("/api/share/past-life-card/", "").replace(".svg", "");
+
+  if (!token) return new Response("Not found", { status: 404 });
+
+  const result = await getPastLifeResultByShareToken(env, token);
+  if (!result) return new Response("Not found", { status: 404 });
+
+  const baseUrl = env.APP_BASE_URL || "https://bige.life";
+  const shareUrl = `${baseUrl}/past-life/share/${result.shareToken}`;
+
+  const svg = buildPastLifeShareSvg(result, { shareUrl, baseUrl });
+
+  return new Response(svg, {
+    status: 200,
+    headers: {
+      "Content-Type": "image/svg+xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
 }
