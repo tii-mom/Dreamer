@@ -11,6 +11,7 @@ import {
 } from "./lib/server/xms-payment.server";
 import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
 import { maybeClawbotReportIngestHandler } from "./lib/server/xms-bot-report-ingest.server";
+import { serveFortuneHistory } from "./lib/server/xms-fortune-history.server";
 import {
   getPastLifeResultByShareToken,
   buildPastLifeShareSvg,
@@ -81,6 +82,10 @@ export default {
 
       if (url.pathname.startsWith("/api/share/past-life-card/") && url.pathname.endsWith(".svg")) {
         return servePastLifeSvg(request, env);
+      }
+
+      if (url.pathname === "/history") {
+        return serveFortuneHistory(request, env);
       }
 
       if (url.pathname.startsWith("/r/")) {
