@@ -174,7 +174,8 @@ async function serveFortuneReport(request: Request, env: CloudflareBindings) {
   if (!id) return new Response("Not found", { status: 404 });
   const result = await readSavedResult(env, id);
   if (!result) return new Response("Not found", { status: 404 });
-  const html = result.html || renderFallbackReport({ title: result.title, summary: result.summary });
+  const html =
+    result.html || renderFallbackReport({ title: result.title, summary: result.summary });
   return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
     headers: { "content-type": "text/html; charset=utf-8" },
   });
@@ -193,10 +194,7 @@ async function serveSharedFortuneReport(request: Request, env: CloudflareBinding
     `<p>${escapeHtml(result.summary)}</p></section>`,
     "</article>",
   ].join("");
-  return new Response(
-    wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }),
-    {
-      headers: { "content-type": "text/html; charset=utf-8" },
-    },
-  );
+  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
 }
