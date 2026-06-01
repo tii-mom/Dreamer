@@ -42,7 +42,7 @@ function BindWechat() {
 
       const result = await createClawbotBindTicket({
         data: {
-          scene: refCode ? "referral" : "bind",
+          scene: refCode ? "referral" : "hermes-weixin-bind",
           referralCode: refCode,
         },
       });
@@ -112,7 +112,7 @@ function BindWechat() {
 
   const copyBindCode = () => {
     if (!bindTicket) return;
-    navigator.clipboard.writeText(bindTicket.bindCode);
+    navigator.clipboard.writeText(`绑定 ${bindTicket.bindCode}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -132,7 +132,7 @@ function BindWechat() {
           </div>
           <h1 className="font-display text-xl text-gold tracking-wide">把戏命师养进微信</h1>
           <p className="text-xs text-muted-foreground">
-            绑定后，可通过微信直接和戏命师对话、抽签、抽盲盒
+            绑定后，每个微信用户都会获得自己的 Hermes 戏命师子 Agent、独立记忆和订阅权益
           </p>
         </header>
 
@@ -158,27 +158,29 @@ function BindWechat() {
         {bindTicket && !loading && (
           <>
             <section className="bg-secondary/40 border border-gold/10 rounded-2xl p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-gold text-left">第一步：添加微信机器人</h2>
+              <h2 className="text-sm font-semibold text-gold text-left">第一步：扫码添加戏命师</h2>
               <div className="flex items-center gap-3 bg-black/30 rounded-xl p-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 grid place-items-center text-lg flex-shrink-0">
                   🤖
                 </div>
                 <div className="text-left">
-                  <p className="text-sm text-bone font-semibold">ClawBot_XMS</p>
-                  <p className="text-[10px] text-muted-foreground">微信搜索并添加该机器人</p>
+                  <p className="text-sm text-bone font-semibold">戏命师 Hermes / ClawBot_XMS</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    扫码或微信搜索添加平台统一的戏命师 Bot；不要使用旧 IP 绑定页
+                  </p>
                 </div>
               </div>
             </section>
 
             <section className="bg-secondary/40 border border-gold/10 rounded-2xl p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-gold text-left">第二步：发送绑定码</h2>
+              <h2 className="text-sm font-semibold text-gold text-left">第二步：发送绑定口令</h2>
               <p className="text-xs text-muted-foreground text-left">
-                在微信中向 ClawBot_XMS 发送以下绑定码：
+                在微信中向戏命师发送以下完整口令，Hermes 收到消息后会自动完成微信身份绑定：
               </p>
 
               <div className="bg-black/40 border-2 border-gold/30 rounded-2xl p-4">
-                <div className="text-3xl font-mono font-bold text-gold tracking-[0.3em] select-all">
-                  {bindTicket.bindCode}
+                <div className="text-xl font-mono font-bold text-gold tracking-[0.12em] select-all">
+                  绑定 {bindTicket.bindCode}
                 </div>
               </div>
 
@@ -186,7 +188,7 @@ function BindWechat() {
                 onClick={copyBindCode}
                 className="w-full h-10 rounded-xl bg-gold/10 border border-gold/30 text-gold text-xs font-semibold hover:bg-gold/20 transition-colors"
               >
-                {copied ? "✓ 已复制绑定码" : "📋 点击复制绑定码"}
+                {copied ? "✓ 已复制绑定口令" : "📋 点击复制绑定口令"}
               </button>
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
@@ -199,7 +201,7 @@ function BindWechat() {
 
             {!bound && !expired && (
               <div className="text-xs text-gold animate-pulse">
-                ⏳ 等待微信绑定中...（自动检测）
+                ⏳ 等待 Hermes 微信消息绑定中...（自动检测）
               </div>
             )}
 
