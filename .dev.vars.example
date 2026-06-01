@@ -11,6 +11,16 @@ DEEPSEEK_REPORT_MODEL=deepseek-v4-pro
 # App runtime
 APP_BASE_URL=http://127.0.0.1:8080
 SESSION_SECRET=
+ADMIN_TOKEN=
+
+# ClawBot webhook security
+CLAWBOT_WEBHOOK_SECRET=
+CLAWBOT_MOCK=true
+
+# BufPay payment provider
+BUFPAY_AID=
+BUFPAY_SECRET=
+BUFPAY_MOCK=true
 
 # PWA web push, optional for MVP until notification sending is implemented
 VAPID_PUBLIC_KEY=
