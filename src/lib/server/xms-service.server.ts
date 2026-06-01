@@ -547,9 +547,10 @@ export async function createPaymentOrderService(
     !env.APP_BASE_URL.includes("localhost") &&
     !env.APP_BASE_URL.includes("127.0.0.1");
 
+  const aid = env.BUFPAY_AID;
   const isMock = env.BUFPAY_MOCK === "true" && !isProd;
 
-  if (!isMock && !env.BUFPAY_AID) {
+  if (!isMock && !aid) {
     throw new Error("BUFPAY_AID not configured");
   }
 
