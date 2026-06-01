@@ -391,9 +391,14 @@ export async function handleMockPaymentSuccess(
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const isMockEnabled = env.BUFPAY_MOCK === "true" || !env.BUFPAY_SECRET;
+  // Only allow mock in dev/preview with explicit BUFPAY_MOCK=true
+  const isProd =
+    env.APP_BASE_URL &&
+    !env.APP_BASE_URL.includes("localhost") &&
+    !env.APP_BASE_URL.includes("127.0.0.1");
+  const isMockEnabled = env.BUFPAY_MOCK === "true" && !isProd;
   if (!isMockEnabled) {
-    return new Response("Forbidden in production", { status: 403 });
+    return new Response("Forbidden", { status: 403 });
   }
 
   let body: { orderId: string };

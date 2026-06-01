@@ -3,10 +3,11 @@ import { Modal } from "./Modal";
 import { motion, AnimatePresence } from "framer-motion";
 import { blindboxRates, marketItems, orderMock } from "@/lib/mock-data";
 import type { ModalKey } from "@/lib/types";
-import type { EarnApplication, ShareAsset } from "@/lib/domain";
+import type { EarnApplication, ShareAsset, ProductCode } from "@/lib/domain";
 import { MasterAvatar } from "./MasterAvatar";
 import { AssetImage } from "./assets/AssetImage";
 import type { AssetVariant } from "@/lib/assets/asset-types";
+import { PaymentPanel } from "./PaymentPanel";
 import {
   Sparkles,
   TrendingUp,
@@ -18,94 +19,49 @@ import {
   Crown,
 } from "lucide-react";
 
-/* ---------------- 充值 ---------------- */
+/* ---------------- 供奉支付 ---------------- */
 export function TopupModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const tiers = [
-    { p: 5.99, label: "解封命盘", tag: "新人专享" },
-    { p: 29.9, label: "盲盒折扣券", tag: "回血必备" },
-    { p: 49.99, label: "月令订阅", tag: "热门" },
-    { p: 99, label: "单抽盲盒", tag: "" },
-    { p: 899, label: "戏命出马", tag: "高阶" },
+  const [activeProduct, setActiveProduct] = useState<ProductCode | null>(null);
+
+  const items: { code: ProductCode; label: string; price: string; tag?: string }[] = [
+    { code: "seal_unlock", label: "解封命盘", price: "¥5.99", tag: "新人" },
+    { code: "blindbox_single", label: "盲盒单抽", price: "¥99" },
+    { code: "blindbox_ten", label: "盲盒十连抽", price: "¥888", tag: "超值" },
+    { code: "operator_899", label: "命铺经营者", price: "¥899", tag: "高阶" },
   ];
-  const [success, setSuccess] = useState<number | null>(null);
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="供奉香火"
-      subtitle="香火不足，天机不灵。模拟支付，不扣真钱。"
-    >
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {tiers.map((t) => (
+    <Modal open={open} onClose={onClose} title="供奉香火" subtitle="选择你要供奉的项目">
+      <div className="grid grid-cols-2 gap-3">
+        {items.map((item) => (
           <button
-            key={t.p}
-            onClick={() => setSuccess(t.p)}
+            key={item.code}
+            onClick={() => setActiveProduct(item.code)}
             className="relative scroll-card rounded-xl p-3 text-left hover:border-gold transition group"
           >
-            {t.tag && (
+            {item.tag && (
               <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 rounded bg-gold/20 text-gold">
-                {t.tag}
+                {item.tag}
               </span>
             )}
-            <div className="font-display text-xl text-gold text-shadow-gold">¥{t.p}</div>
-            <div className="text-xs text-muted-foreground mt-1">{t.label}</div>
-            <div className="mt-3 text-[10px] text-gold opacity-0 group-hover:opacity-100 transition">
-              点击供奉 →
-            </div>
+            <div className="font-display text-xl text-gold text-shadow-gold">{item.price}</div>
+            <div className="text-xs text-muted-foreground mt-1">{item.label}</div>
           </button>
         ))}
-        <div className="scroll-card rounded-xl p-3">
-          <div className="text-xs text-muted-foreground mb-2">自定义金额</div>
-          <input
-            placeholder="¥"
-            className="w-full bg-secondary/60 border border-gold/20 rounded-lg px-3 h-9 text-sm text-bone outline-none focus:border-gold/50 focus-visible:ring-1 focus-visible:ring-ring"
-          />
-          <button
-            onClick={() => setSuccess(66)}
-            className="w-full mt-2 h-8 rounded-lg ritual-btn text-xs"
-          >
-            叩拜供奉
-          </button>
-        </div>
       </div>
 
-      <AnimatePresence>
-        {success !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="mt-6 relative scroll-card rounded-2xl p-5 text-center overflow-hidden"
-          >
-            {/* 燃烧符纸 emoji ember */}
-            <div className="absolute inset-0 pointer-events-none">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <span
-                  key={i}
-                  className="absolute text-gold animate-ember"
-                  style={{
-                    left: `${(i * 8.3) % 100}%`,
-                    bottom: 0,
-                    animationDelay: `${i * 0.2}s`,
-                    fontSize: 12 + (i % 3) * 4,
-                  }}
-                >
-                  ✧
-                </span>
-              ))}
-            </div>
-            <div className="relative">
-              <Check size={28} className="mx-auto text-gold" />
-              <div className="mt-2 font-display text-lg text-gold-gradient">
-                供奉成功 · ¥{success}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                气运 +{Math.round(success * 10)}，符纸已焚于香炉。
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {activeProduct && (
+        <div className="mt-4">
+          <PaymentPanel
+            productCode={activeProduct}
+            onSuccess={() => {
+              setActiveProduct(null);
+              onClose();
+            }}
+            onCancel={() => setActiveProduct(null)}
+          />
+        </div>
+      )}
     </Modal>
   );
 }
@@ -135,7 +91,7 @@ export function SubModal({ open, onClose }: { open: boolean; onClose: () => void
       was: 12999,
       now: 899,
       period: "/月",
-      perks: ["开通算命铺子", "自动接单 / 排盘", "自动报告生成", "模拟收益面板"],
+      perks: ["开通算命铺子", "自动接单 / 排盘", "自动报告生成", "香火值活动权益"],
       color: "from-destructive/20 to-accent/30",
     },
   ];
@@ -145,7 +101,7 @@ export function SubModal({ open, onClose }: { open: boolean; onClose: () => void
       onClose={onClose}
       title="月令契约 · 三层漏斗"
       size="lg"
-      subtitle="订阅后可解锁每日流日、吉时提醒和灵签。首版为模拟候补。"
+      subtitle="订阅后可解锁每日流日、吉时提醒和灵签。"
     >
       <div className="grid md:grid-cols-3 gap-3">
         {plans.map((p) => (
@@ -182,7 +138,7 @@ export function SubModal({ open, onClose }: { open: boolean; onClose: () => void
         ))}
       </div>
       <p className="mt-4 text-[11px] text-muted-foreground text-center">
-        * 原型演示价格，模拟订阅状态。续费随时可断，命数不强求。
+        * 订阅功能即将上线，敬请期待。
       </p>
     </Modal>
   );
@@ -292,10 +248,10 @@ export function BoxModal({ open, onClose }: { open: boolean; onClose: () => void
           </div>
           <div className="mt-4 flex gap-2 justify-center">
             <button
-              onClick={reset}
-              className="px-4 h-9 rounded-lg bg-secondary/70 border border-gold/20 text-bone text-xs"
+              onClick={() => onOpenModal("box")}
+              className="text-xs px-3 h-8 rounded-lg ritual-btn flex-1"
             >
-              再抽一次
+              进入盲盒
             </button>
             <button className="px-4 h-9 rounded-lg ritual-btn text-xs">收藏命师</button>
           </div>
@@ -421,7 +377,7 @@ export function MarketDrawer({ open, onClose }: { open: boolean; onClose: () => 
                   {m.change}%
                 </div>
                 <button className="mt-1 h-7 px-3 rounded-lg ritual-btn text-[11px]">
-                  模拟购买
+                  查看详情
                 </button>
               </div>
             </div>
@@ -750,31 +706,24 @@ export function SealModal({
       open={open}
       onClose={onClose}
       title="解封命盘"
-      subtitle="第一版暂不真实收款，先验证转化意愿。"
+      subtitle="完整 HTML 命盘、大运流年、四化飞星、三方四正"
       size="sm"
     >
       <div className="text-center py-4">
         <Flame size={28} className="mx-auto text-gold animate-twinkle" />
-        <p className="mt-3 text-sm text-bone">命盘剩余 70% 原价 ¥599，首版模拟 ¥5.99 解封</p>
+        <p className="mt-3 text-sm text-bone">解封完整命盘，查看前世今生</p>
         <p className="text-[11px] text-muted-foreground mt-1">
           含：大运流年 · 四化飞星 · 三方四正 · 命主身主
         </p>
-        <div className="mt-5 flex gap-2 justify-center">
-          <button
-            onClick={onClose}
-            className="px-5 h-10 rounded-xl bg-secondary/70 border border-gold/20 text-bone text-sm"
-          >
-            稍后再说
-          </button>
-          <button
-            onClick={() => {
+        <div className="mt-5">
+          <PaymentPanel
+            productCode="seal_unlock"
+            onSuccess={() => {
               onPaid();
               onClose();
             }}
-            className="px-5 h-10 rounded-xl ritual-btn text-sm"
-          >
-            模拟解封
-          </button>
+            onCancel={onClose}
+          />
         </div>
       </div>
     </Modal>
