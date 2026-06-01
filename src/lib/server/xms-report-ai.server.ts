@@ -20,7 +20,12 @@ export async function generateHtmlReport(input: HtmlReportInput) {
   });
 
   if (!accountId || !gatewayId || !apiKey) {
-    return { html: fallback, summary: input.topic, model, status: "fallback" as const };
+    return {
+      html: fallback,
+      summary: input.topic,
+      model,
+      status: "fallback" as const,
+    };
   }
 
   try {
@@ -31,7 +36,10 @@ export async function generateHtmlReport(input: HtmlReportInput) {
         headers: {
           "content-type": "application/json",
           authorization: `Bearer ${apiKey}`,
-          "cf-aig-metadata": JSON.stringify({ userId: input.userId, feature: "html-report" }),
+          "cf-aig-metadata": JSON.stringify({
+            userId: input.userId,
+            feature: "html-report",
+          }),
         },
         body: JSON.stringify({
           model,
@@ -52,11 +60,27 @@ export async function generateHtmlReport(input: HtmlReportInput) {
         }),
       },
     );
-    if (!response.ok) return { html: fallback, summary: input.topic, model, status: "fallback" as const };
-    const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+
+    if (!response.ok) {
+      return {
+        html: fallback,
+        summary: input.topic,
+        model,
+        status: "fallback" as const,
+      };
+    }
+
+    const payload = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
     const html = payload.choices?.[0]?.message?.content?.trim() || fallback;
     return { html, summary: input.topic, model, status: "ok" as const };
   } catch {
-    return { html: fallback, summary: input.topic, model, status: "fallback" as const };
+    return {
+      html: fallback,
+      summary: input.topic,
+      model,
+      status: "fallback" as const,
+    };
   }
 }
