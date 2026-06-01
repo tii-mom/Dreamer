@@ -2,21 +2,21 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { wrapReportHtml, renderFallbackReport, escapeHtml } from "./lib/fortune/report-html";
-import { logEvent } from "./lib/server/xms-store.server";
+import { escapeHtml, renderFallbackReport, wrapReportHtml } from "./lib/fortune/report-html";
+import { maybeClawbotReportIngestHandler } from "./lib/server/xms-bot-report-ingest.server";
+import { clawbotIngestHandler, clawbotWebhookHandler } from "./lib/server/xms-bot.server";
+import { serveFortuneHistory } from "./lib/server/xms-fortune-history.server";
+import { readSavedResult, readSharedResult } from "./lib/server/xms-fortune-result.server";
 import {
+  buildPastLifeShareSvg,
+  getPastLifeResultByShareToken,
+} from "./lib/server/xms-past-life.server";
+import {
+  handleAdminRequest,
   handleBufPayCallback,
   handleMockPaymentSuccess,
-  handleAdminRequest,
 } from "./lib/server/xms-payment.server";
-import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
-import { maybeClawbotReportIngestHandler } from "./lib/server/xms-bot-report-ingest.server";
-import { serveFortuneHistory } from "./lib/server/xms-fortune-history.server";
-import {
-  getPastLifeResultByShareToken,
-  buildPastLifeShareSvg,
-} from "./lib/server/xms-past-life.server";
-import { readSavedResult, readSharedResult } from "./lib/server/xms-fortune-result.server";
+import { logEvent } from "./lib/server/xms-store.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -186,7 +186,13 @@ async function serveSharedFortuneReport(request: Request, env: CloudflareBinding
   if (!token) return new Response("Not found", { status: 404 });
   const result = await readSharedResult(env, token);
   if (!result) return new Response("Not found", { status: 404 });
-  const html = `<article class="xms-report"><h1>${escapeHtml(result.title)}</h1><section><h2>Summary</h2><p>${escapeHtml(result.summary)}</p></section></article>`;
+  const html = [
+    '<article class="xms-report">',
+    `<h1>${escapeHtml(result.title)}</h1>`,
+    "<section><h2>Summary</h2>",
+    `<p>${escapeHtml(result.summary)}</p></section>`,
+    "</article>",
+  ].join("");
   return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
     headers: { "content-type": "text/html; charset=utf-8" },
   });
