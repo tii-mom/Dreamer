@@ -193,7 +193,10 @@ async function serveSharedFortuneReport(request: Request, env: CloudflareBinding
     `<p>${escapeHtml(result.summary)}</p></section>`,
     "</article>",
   ].join("");
-  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
+  return new Response(
+    wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }),
+    {
+      headers: { "content-type": "text/html; charset=utf-8" },
+    },
+  );
 }
