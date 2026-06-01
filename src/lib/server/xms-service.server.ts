@@ -227,10 +227,12 @@ export async function handleUserMessage(
     await saveBirthProfileRecord(env, user.id, parsed);
     birthProfile = parsed;
     // Generate chart if birth time is available
-    try {
-      await saveOrUpdateUserChart(env, user.id, parsed);
-    } catch {
-      // Chart generation failed (likely missing birth time) — that's OK
+    if (parsed.birthTime) {
+      try {
+        await saveOrUpdateUserChart(env, user.id, parsed);
+      } catch {
+        // Chart generation failed — that's OK
+      }
     }
     user = await updateUser(env, {
       ...user,
@@ -312,11 +314,13 @@ export async function saveBirthProfile(
     sealUnlocked: 30,
     chartGlow: Math.max(bootstrap.user.chartGlow, 40),
   });
-  // Generate chart if possible
-  try {
-    await saveOrUpdateUserChart(env, user.id, profile);
-  } catch {
-    // Ignore chart errors (e.g. missing birth time)
+  // Generate chart if possible (requires birth time)
+  if (profile.birthTime) {
+    try {
+      await saveOrUpdateUserChart(env, user.id, profile);
+    } catch {
+      // Ignore chart errors
+    }
   }
   await logEvent(env, user.id, "birth_profile_saved", { calendarType: profile.calendarType });
   return { user, birthProfile: saved };
@@ -533,7 +537,6 @@ export async function createPaymentOrderService(
   });
 
   const aid = env.BUFPAY_AID;
-  const secretKey = env.BUFPAY_SECRET || env.SESSION_SECRET || "MOCK_SECRET";
   const isMock = env.BUFPAY_MOCK === "true" || !aid;
 
   if (isMock) {
@@ -571,12 +574,16 @@ export async function createPaymentOrderService(
   }
 
   // Real production integration with BufPay
+  const bufpaySecret = env.BUFPAY_SECRET;
+  if (!bufpaySecret) {
+    throw new Error("BUFPAY_SECRET not configured");
+  }
   const notifyUrl = `${env.APP_BASE_URL || ""}/api/pay/callback`;
   const returnUrl = `${env.APP_BASE_URL || ""}/?pay_return=${orderId}`;
   const feedbackUrl = `${env.APP_BASE_URL || ""}/?pay_feedback=${orderId}`;
 
   // Signature calculation: name + pay_type + price + order_id + order_uid + notify_url + return_url + feedback_url + secret
-  const signString = `${product.name}${input.payType}${displayPrice}${orderId}${user.id}${notifyUrl}${returnUrl}${feedbackUrl}${secretKey}`;
+  const signString = `${product.name}${input.payType}${displayPrice}${orderId}${user.id}${notifyUrl}${returnUrl}${feedbackUrl}${bufpaySecret}`;
   const sign = md5(signString);
 
   const bodyParams = new URLSearchParams({
@@ -647,11 +654,6 @@ export async function queryPaymentStatusService(
     throw new Error("订单不存在");
   }
 
-  // If local status is already success, return it immediately
-  if (payment.status === "success" || payment.status === "mock_success") {
-    return { status: payment.status, priceCents: payment.priceCents };
-  }
-
   const aid = env.BUFPAY_AID;
   const isMock = env.BUFPAY_MOCK === "true" || !aid;
 
@@ -680,7 +682,6 @@ export async function queryPaymentStatusService(
             if (updated) {
               await applyPaymentEntitlement(env, updated);
             }
-            return { status: "success", priceCents: payment.priceCents };
           }
         } else if (data.status === "expire") {
           await updatePaymentStatus(env, payment.orderId, "expire");

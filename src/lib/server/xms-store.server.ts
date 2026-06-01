@@ -63,6 +63,8 @@ export type DevStore = {
     error?: string;
     createdAt: string;
   }>;
+  birthCharts: Map<string, Record<string, unknown>>;
+  botTickets: Map<string, Record<string, unknown>>;
 };
 
 export function devStore(): DevStore {
@@ -88,6 +90,8 @@ export function devStore(): DevStore {
       rewardLedger: new Map(),
       events: [],
       aiLogs: [],
+      birthCharts: new Map(),
+      botTickets: new Map(),
     };
   }
   return global.__xmsDevStore;

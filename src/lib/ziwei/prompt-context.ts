@@ -52,7 +52,10 @@ function getDaXianAgeString(palace: { daXianAge?: [number, number] }): string {
   return `${palace.daXianAge[0]}-${palace.daXianAge[1]}岁`;
 }
 
-export function buildZiweiPromptContext(chart: ZiweiChart): ZiweiPromptContext {
+export function buildZiweiPromptContext(
+  chart: ZiweiChart,
+  genderUnknown?: boolean,
+): ZiweiPromptContext {
   const mingPalace = chart.palaces.find((p) => p.branch === chart.mingGongBranch);
   const shenPalace = chart.palaces.find((p) => p.branch === chart.shenGongBranch);
   const currentDx = chart.daXians[chart.currentDaXianIndex];
@@ -141,7 +144,7 @@ export function buildZiweiPromptContext(chart: ZiweiChart): ZiweiPromptContext {
   }
 
   // Gender warning
-  if (chart.birthInfo.gender !== "male" && chart.birthInfo.gender !== "female") {
+  if (genderUnknown) {
     lines.push("\n⚠ 性别未确认，部分判断需谨慎。");
   }
 

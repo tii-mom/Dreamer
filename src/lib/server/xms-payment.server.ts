@@ -213,7 +213,11 @@ export async function handleBufPayCallback(
     return new Response("ok", { status: 200 });
   }
 
-  const secretKey = env.BUFPAY_SECRET || env.SESSION_SECRET || "MOCK_SECRET";
+  const secretKey = env.BUFPAY_SECRET;
+  if (!secretKey) {
+    console.error("[Payment Callback] BUFPAY_SECRET not configured");
+    return new Response("Server Configuration Error", { status: 500 });
+  }
   const calculatedSign = md5(`${aoid}${orderId}${orderUid}${price}${payPrice}${secretKey}`);
 
   if (sign.toLowerCase() !== calculatedSign) {

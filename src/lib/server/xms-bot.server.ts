@@ -211,7 +211,17 @@ export async function handleBotMessage(
         `回「抽签」求取今日灵签保护；回「盲盒」抽取财运铭文加成。`;
       break;
 
-    case "my":
+    case "my": {
+      // Determine actual chart status
+      const bp = await getBirthProfile(env, user.id);
+      const chartContext = bp ? await getOrCreateUserChart(env, user.id, bp) : null;
+      const chartStatus = chartContext?.chart
+        ? "已起盘"
+        : bp?.birthTime
+          ? "排盘失败（请重新输入完整出生信息）"
+          : bp
+            ? "未补全出生时辰"
+            : "未提交出生资料";
       replyText =
         `☯️ 你的命理账户：\n` +
         `代号：${user.nickname}\n` +
@@ -219,9 +229,10 @@ export async function handleBotMessage(
         `级别：${user.level}\n` +
         `命盘状态：${user.sealUnlocked}% 解封\n` +
         `经营者：${user.shopOpen ? "已激活" : "未开通"}\n` +
-        `命盘：${user.sealUnlocked >= 100 ? "已起盘" : "未补全出生时辰"}\n\n` +
+        `命盘：${chartStatus}\n\n` +
         `绑定恢复码：${user.recoveryCode}\n(请妥善保存，在网页端输入可同步此微信数据)`;
       break;
+    }
 
     case "blindbox": {
       const ticketUrl = await buildTicketUrl(env, user, providerUserId, "blindbox", "/wx/blindbox");

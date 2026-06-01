@@ -32,11 +32,17 @@ export function parseBirthProfileFromText(text: string): BirthProfile | null {
   if (!match) return null;
   const [, year, month, day, hour] = match;
   const date = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  let gender: "male" | "female" | "unknown" = "unknown";
+  if (/男(命)?/.test(text)) {
+    gender = "male";
+  } else if (/女(命)?/.test(text)) {
+    gender = "female";
+  }
   return {
     calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
     birthDate: date,
     birthTime: hour ? `${hour.padStart(2, "0")}:00` : undefined,
-    gender: "unknown",
+    gender,
     rawText: text,
   };
 }
@@ -50,13 +56,14 @@ export function birthProfileToBirthInfo(profile: BirthProfile): BirthInfo | null
   if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
 
   const hourIndex = timeToShichenIndex(profile.birthTime);
+  if (hourIndex === null) return null;
 
   return {
     year,
     month,
     day,
-    hour: hourIndex ?? 0,
-    gender: profile.gender === "male" ? "male" : "female",
+    hour: hourIndex,
+    gender: profile.gender === "female" ? "female" : "male",
   };
 }
 
@@ -164,7 +171,8 @@ export async function saveOrUpdateUserChart(
   }
 
   const chart = generateChart(birthInfo);
-  const context = buildZiweiPromptContext(chart);
+  const genderUnknown = profile.gender !== "male" && profile.gender !== "female";
+  const context = buildZiweiPromptContext(chart, genderUnknown);
 
   const chartJson = JSON.stringify(chart);
   const summaryJson = JSON.stringify({ summary: context.summary, compact: context.compact });
