@@ -8,7 +8,7 @@ import {
   handleMockPaymentSuccess,
   handleAdminRequest,
 } from "./lib/server/xms-payment.server";
-import { clawbotWebhookHandler } from "./lib/server/xms-bot.server";
+import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -50,6 +50,10 @@ export default {
       const url = new URL(request.url);
       if (url.pathname === "/api/bot/clawbot/webhook") {
         return clawbotWebhookHandler(request, env);
+      }
+
+      if (url.pathname === "/api/bot/clawbot/ingest" && request.method === "POST") {
+        return clawbotIngestHandler(request, env);
       }
 
       if (url.pathname === "/api/pay/callback" && request.method === "POST") {
