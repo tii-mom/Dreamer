@@ -114,9 +114,6 @@ export const createPaymentOrder = createServerFn({ method: "POST" })
     z.object({
       productCode: z.enum([
         "seal_unlock",
-        "monthly_sub",
-        "monthly_sub_30d",
-        "shop_contract",
         "operator_899",
         "blindbox_single",
         "blindbox_ten",

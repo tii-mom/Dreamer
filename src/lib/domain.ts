@@ -108,8 +108,6 @@ export type PaymentStatus =
 
 export type ProductCode =
   | "seal_unlock"
-  | "monthly_sub"
-  | "shop_contract"
   | "operator_899"
   | "blindbox_single"
   | "blindbox_ten"

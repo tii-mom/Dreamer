@@ -75,12 +75,14 @@ export async function handleBotMessage(
   let user = binding ? await getUser(env, binding.userId) : null;
 
   if (!binding || !user) {
-    // Create guest user
-    const guestId = `usr_${crypto.randomUUID().slice(0, 8)}`;
-    user = await createUser(env, guestId, `微信道友_${providerUserId.slice(-4)}`);
+    // Create user first, then create binding with the real user id
+    user = await createUser(env, {
+      nickname: `微信道友_${providerUserId.slice(-4)}`,
+      source: "clawbot",
+    });
     binding = {
       id: `bin_${crypto.randomUUID().slice(0, 8)}`,
-      userId: guestId,
+      userId: user.id,
       provider: "clawbot",
       providerUserId,
       status: "active",

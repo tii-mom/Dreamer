@@ -1,6 +1,13 @@
 import { createHash } from "node:crypto";
 import type { UserProfile, PaymentRecord } from "../domain";
-import { getUser, updateUser, devStore, getD1, nowIso } from "./xms-store.server";
+import {
+  getUser,
+  updateUser,
+  devStore,
+  getD1,
+  nowIso,
+  markPaymentEntitlementApplied,
+} from "./xms-store.server";
 
 type PaymentRow = PaymentRecord & {
   entitlement_applied?: number;
@@ -20,30 +27,8 @@ function normalizePaymentRow(row: PaymentRow | null | undefined): PaymentRecord 
   } as PaymentRecord;
 }
 
-// Define first-version products registry
-export const PRODUCTS_REGISTRY: Record<string, { code: string; name: string; priceCents: number }> =
-  {
-    seal_unlock: {
-      code: "seal_unlock",
-      name: "解封命盘",
-      priceCents: 599,
-    },
-    operator_899: {
-      code: "operator_899",
-      name: "命铺经营者",
-      priceCents: 89900,
-    },
-    blindbox_single: {
-      code: "blindbox_single",
-      name: "命师盲盒单抽",
-      priceCents: 9900,
-    },
-    blindbox_ten: {
-      code: "blindbox_ten",
-      name: "命师盲盒十连抽",
-      priceCents: 88800,
-    },
-  };
+import { PRODUCTS } from "../products";
+export const PRODUCTS_REGISTRY = PRODUCTS;
 
 // Standard MD5 function utilizing Node.js native crypto via compatibility layer
 export function md5(input: string): string {
@@ -54,8 +39,9 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
   const db = env.DB;
   const now = new Date().toISOString();
 
-  // Ensure entitlement is applied only once
-  if (payment.entitlementApplied) {
+  // Atomic entitlement check: only proceed if we can mark entitlement as applied
+  const acquired = await markPaymentEntitlementApplied(env, payment.orderId);
+  if (!acquired) {
     console.log(`[Payment] Entitlement already applied for order ${payment.orderId}, skipping.`);
     return;
   }
@@ -271,21 +257,6 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
         .run();
     }
   }
-
-  // Set entitlement applied flag
-  if (!db) {
-    const localPayment = devStore().payments.get(payment.orderId);
-    if (localPayment) {
-      localPayment.entitlementApplied = true;
-    }
-  } else {
-    await db
-      .prepare(
-        "UPDATE payments SET entitlement_applied = 1, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
-      )
-      .bind(payment.orderId)
-      .run();
-  }
 }
 
 export async function handleBufPayCallback(
@@ -358,6 +329,11 @@ export async function handleBufPayCallback(
     return new Response("ok", { status: 200 });
   }
 
+  if (payment.aoid && payment.aoid !== aoid) {
+    console.error("[Payment Callback] AOID mismatch. Expected:", payment.aoid, "Received:", aoid);
+    return new Response("ok", { status: 200 });
+  }
+
   if (payment.displayPrice !== price) {
     console.error(
       "[Payment Callback] Price mismatch. Expected:",
@@ -365,6 +341,22 @@ export async function handleBufPayCallback(
       "Received:",
       price,
     );
+    return new Response("ok", { status: 200 });
+  }
+
+  // Store raw callback data
+  if (db) {
+    await db
+      .prepare(
+        "UPDATE payments SET callback_raw_json = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
+      )
+      .bind(bodyText, orderId)
+      .run();
+  }
+
+  // Skip if already in terminal state
+  if (payment.status === "success" || payment.status === "mock_success") {
+    console.log("[Payment Callback] Duplicate callback for terminal order:", orderId);
     return new Response("ok", { status: 200 });
   }
 
@@ -385,7 +377,7 @@ export async function handleBufPayCallback(
       .run();
   }
 
-  // Apply entitlement
+  // Apply entitlement (idempotent via atomic markPaymentEntitlementApplied)
   await applyPaymentEntitlement(env, payment);
 
   return new Response("ok", { status: 200 });

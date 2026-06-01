@@ -465,43 +465,8 @@ export async function recordEvent(
   return { ok: true };
 }
 
-// Payment Service Implementations
 import { md5 } from "./xms-payment.server";
-
-const PRODUCTS = {
-  seal_unlock: {
-    name: "解封命盘",
-    priceCents: 599,
-  },
-  monthly_sub: {
-    name: "趋吉避凶 · 月令契约",
-    priceCents: 4999,
-  },
-  monthly_sub_30d: {
-    name: "趋吉避凶 · 月令契约 30 天",
-    priceCents: 4999,
-  },
-  shop_contract: {
-    name: "戏命出马 · 命铺契约",
-    priceCents: 89900,
-  },
-  operator_899: {
-    name: "命铺经营者",
-    priceCents: 89900,
-  },
-  blindbox_single: {
-    name: "单抽盲盒",
-    priceCents: 9900,
-  },
-  blindbox_ten: {
-    name: "十连盲盒",
-    priceCents: 88800,
-  },
-  qiyun_topup: {
-    name: "供奉香火",
-    priceCents: 0, // dynamic
-  },
-} as const;
+import { getProduct, formatPrice } from "../products";
 
 export async function createPaymentOrderService(
   context: unknown,
@@ -516,10 +481,7 @@ export async function createPaymentOrderService(
   const bootstrap = await ensureSessionFromToken(context, token);
   const user = bootstrap.user;
 
-  const product = PRODUCTS[input.productCode];
-  if (!product) {
-    throw new Error("商品不存在");
-  }
+  const product = getProduct(input.productCode);
 
   let priceCents = product.priceCents;
   if (input.productCode === "qiyun_topup") {
@@ -529,7 +491,7 @@ export async function createPaymentOrderService(
     priceCents = input.amountCents;
   }
 
-  const displayPrice = (priceCents / 100).toFixed(2);
+  const displayPrice = formatPrice(priceCents);
   const orderId = randomId("pay");
 
   // Read referral code from cookie
