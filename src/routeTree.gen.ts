@@ -20,6 +20,11 @@ import { Route as BindRouteImport } from './routes/bind'
 import { Route as AssetsRouteImport } from './routes/assets'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WxPayRouteImport } from './routes/wx.pay'
+import { Route as WxOperatorRouteImport } from './routes/wx.operator'
+import { Route as WxHomeRouteImport } from './routes/wx.home'
+import { Route as WxBlindboxRouteImport } from './routes/wx.blindbox'
+import { Route as WxAssetsRouteImport } from './routes/wx.assets'
 import { Route as SRefCodeRouteImport } from './routes/s.$refCode'
 import { Route as OperatorPayRouteImport } from './routes/operator.pay'
 import { Route as OperatorDashboardRouteImport } from './routes/operator.dashboard'
@@ -80,6 +85,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WxPayRoute = WxPayRouteImport.update({
+  id: '/wx/pay',
+  path: '/wx/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WxOperatorRoute = WxOperatorRouteImport.update({
+  id: '/wx/operator',
+  path: '/wx/operator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WxHomeRoute = WxHomeRouteImport.update({
+  id: '/wx/home',
+  path: '/wx/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WxBlindboxRoute = WxBlindboxRouteImport.update({
+  id: '/wx/blindbox',
+  path: '/wx/blindbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WxAssetsRoute = WxAssetsRouteImport.update({
+  id: '/wx/assets',
+  path: '/wx/assets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SRefCodeRoute = SRefCodeRouteImport.update({
   id: '/s/$refCode',
   path: '/s/$refCode',
@@ -117,6 +147,11 @@ export interface FileRoutesByFullPath {
   '/operator/dashboard': typeof OperatorDashboardRoute
   '/operator/pay': typeof OperatorPayRoute
   '/s/$refCode': typeof SRefCodeRoute
+  '/wx/assets': typeof WxAssetsRoute
+  '/wx/blindbox': typeof WxBlindboxRoute
+  '/wx/home': typeof WxHomeRoute
+  '/wx/operator': typeof WxOperatorRoute
+  '/wx/pay': typeof WxPayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +169,11 @@ export interface FileRoutesByTo {
   '/operator/dashboard': typeof OperatorDashboardRoute
   '/operator/pay': typeof OperatorPayRoute
   '/s/$refCode': typeof SRefCodeRoute
+  '/wx/assets': typeof WxAssetsRoute
+  '/wx/blindbox': typeof WxBlindboxRoute
+  '/wx/home': typeof WxHomeRoute
+  '/wx/operator': typeof WxOperatorRoute
+  '/wx/pay': typeof WxPayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +192,11 @@ export interface FileRoutesById {
   '/operator/dashboard': typeof OperatorDashboardRoute
   '/operator/pay': typeof OperatorPayRoute
   '/s/$refCode': typeof SRefCodeRoute
+  '/wx/assets': typeof WxAssetsRoute
+  '/wx/blindbox': typeof WxBlindboxRoute
+  '/wx/home': typeof WxHomeRoute
+  '/wx/operator': typeof WxOperatorRoute
+  '/wx/pay': typeof WxPayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +216,11 @@ export interface FileRouteTypes {
     | '/operator/dashboard'
     | '/operator/pay'
     | '/s/$refCode'
+    | '/wx/assets'
+    | '/wx/blindbox'
+    | '/wx/home'
+    | '/wx/operator'
+    | '/wx/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +238,11 @@ export interface FileRouteTypes {
     | '/operator/dashboard'
     | '/operator/pay'
     | '/s/$refCode'
+    | '/wx/assets'
+    | '/wx/blindbox'
+    | '/wx/home'
+    | '/wx/operator'
+    | '/wx/pay'
   id:
     | '__root__'
     | '/'
@@ -205,6 +260,11 @@ export interface FileRouteTypes {
     | '/operator/dashboard'
     | '/operator/pay'
     | '/s/$refCode'
+    | '/wx/assets'
+    | '/wx/blindbox'
+    | '/wx/home'
+    | '/wx/operator'
+    | '/wx/pay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -220,6 +280,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TryRoute: typeof TryRoute
   SRefCodeRoute: typeof SRefCodeRoute
+  WxAssetsRoute: typeof WxAssetsRoute
+  WxBlindboxRoute: typeof WxBlindboxRoute
+  WxHomeRoute: typeof WxHomeRoute
+  WxOperatorRoute: typeof WxOperatorRoute
+  WxPayRoute: typeof WxPayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,6 +366,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wx/pay': {
+      id: '/wx/pay'
+      path: '/wx/pay'
+      fullPath: '/wx/pay'
+      preLoaderRoute: typeof WxPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wx/operator': {
+      id: '/wx/operator'
+      path: '/wx/operator'
+      fullPath: '/wx/operator'
+      preLoaderRoute: typeof WxOperatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wx/home': {
+      id: '/wx/home'
+      path: '/wx/home'
+      fullPath: '/wx/home'
+      preLoaderRoute: typeof WxHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wx/blindbox': {
+      id: '/wx/blindbox'
+      path: '/wx/blindbox'
+      fullPath: '/wx/blindbox'
+      preLoaderRoute: typeof WxBlindboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wx/assets': {
+      id: '/wx/assets'
+      path: '/wx/assets'
+      fullPath: '/wx/assets'
+      preLoaderRoute: typeof WxAssetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s/$refCode': {
       id: '/s/$refCode'
       path: '/s/$refCode'
@@ -369,6 +469,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TryRoute: TryRoute,
   SRefCodeRoute: SRefCodeRoute,
+  WxAssetsRoute: WxAssetsRoute,
+  WxBlindboxRoute: WxBlindboxRoute,
+  WxHomeRoute: WxHomeRoute,
+  WxOperatorRoute: WxOperatorRoute,
+  WxPayRoute: WxPayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import type { UserProfile } from "../domain";
 import { getUser, devStore } from "./xms-store.server";
 
@@ -24,10 +25,9 @@ export async function getBindingByProviderUser(
 ): Promise<WechatBinding | null> {
   const db = env.DB;
   if (!db) {
-    // Local memory fallback
     for (const bind of devStore().wechatBindings.values()) {
       if (bind.provider === provider && bind.providerUserId === providerUserId) {
-        return bind;
+        return bind as unknown as WechatBinding;
       }
     }
     return null;
@@ -103,7 +103,7 @@ export async function getBindingByUserId(
   const db = env.DB;
   if (!db) {
     for (const bind of devStore().wechatBindings.values()) {
-      if (bind.userId === userId) return bind;
+      if (bind.userId === userId) return bind as unknown as WechatBinding;
     }
     return null;
   }
@@ -131,21 +131,87 @@ export async function getBindingByUserId(
   };
 }
 
+/**
+ * In-memory nonce dedup set (per-worker, resets on restart)
+ */
+const recentNonces = new Set<string>();
+const NONCE_DEDUP_TTL_MS = 300_000; // 5 minutes
+
+/**
+ * Verify ClawBot webhook signature using HMAC-SHA256
+ *
+ * Headers:
+ *   x-clawbot-timestamp  - Unix timestamp in seconds
+ *   x-clawbot-nonce      - Random nonce string
+ *   x-clawbot-signature  - HMAC-SHA256(timestamp + "." + nonce + "." + rawBody, secret)
+ *
+ * Requirements:
+ * - timestamp must be within 5 minutes of current time
+ * - nonce must not have been seen before (dedup for 5 min)
+ * - signature must match computed HMAC
+ * - CLAWBOT_MOCK=true bypasses signature check (local dev only)
+ */
 export function verifyClawbotSignature(
   request: Request,
   env: CloudflareBindings,
   bodyText: string,
 ): boolean {
-  const secret = env.CLAWBOT_WEBHOOK_SECRET || "MOCK_CLAWBOT_SECRET";
-  const signature = request.headers.get("x-clawbot-signature");
+  const secret = env.CLAWBOT_WEBHOOK_SECRET;
+  const isMock = env.CLAWBOT_MOCK === "true";
 
-  // If secret signature is not provided or set to mock, bypass for testing ease
-  if (secret === "MOCK_CLAWBOT_SECRET" && !signature) {
+  // Local dev bypass
+  if (isMock && !secret) {
     return true;
   }
 
-  if (!signature) return false;
+  const timestamp = request.headers.get("x-clawbot-timestamp");
+  const nonce = request.headers.get("x-clawbot-nonce");
+  const signature = request.headers.get("x-clawbot-signature");
 
-  // Simple check for ClawBot payload signature
-  return signature === secret;
+  if (!timestamp || !nonce || !signature) {
+    console.error("[ClawBot] Missing signature headers");
+    return false;
+  }
+
+  // Validate timestamp (5 minute window)
+  const ts = parseInt(timestamp, 10);
+  if (isNaN(ts)) {
+    console.error("[ClawBot] Invalid timestamp");
+    return false;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - ts) > 300) {
+    console.error("[ClawBot] Timestamp expired or in future:", ts, "now:", now);
+    return false;
+  }
+
+  // Check nonce dedup
+  const dedupKey = `${nonce}:${timestamp}`;
+  if (recentNonces.has(dedupKey)) {
+    console.error("[ClawBot] Duplicate nonce detected:", nonce);
+    return false;
+  }
+  recentNonces.add(dedupKey);
+  // Cleanup old entries after TTL
+  setTimeout(() => recentNonces.delete(dedupKey), NONCE_DEDUP_TTL_MS);
+
+  // Compute expected signature
+  const payload = `${timestamp}.${nonce}.${bodyText}`;
+  const expected = createHmac("sha256", secret ?? "")
+    .update(payload, "utf-8")
+    .digest("hex");
+
+  // Constant-time comparison to prevent timing attacks
+  if (signature.length !== expected.length) return false;
+  let match = 0;
+  for (let i = 0; i < signature.length; i++) {
+    match |= signature.charCodeAt(i) ^ expected.charCodeAt(i);
+  }
+
+  if (match !== 0) {
+    console.error("[ClawBot] Signature mismatch");
+    return false;
+  }
+
+  return true;
 }
