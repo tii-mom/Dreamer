@@ -118,6 +118,11 @@ function TryChat() {
   }
 
   function onPaidSeal() {
+    // Invalidate all relevant caches
+    queryClient.invalidateQueries({ queryKey: ["xms-bootstrap"] });
+    queryClient.invalidateQueries({ queryKey: ["operator-status"] });
+    queryClient.invalidateQueries({ queryKey: ["blindbox-draws"] });
+    queryClient.invalidateQueries({ queryKey: ["user-assets"] });
     setOptimisticMessages((current) => [
       ...current,
       {

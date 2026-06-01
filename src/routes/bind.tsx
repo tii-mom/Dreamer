@@ -89,7 +89,7 @@ function BindWechat() {
         <div className="pt-2">
           <form onSubmit={handleMockBind} className="space-y-3">
             <div className="text-xs text-muted-foreground text-left">
-              模拟快速绑定（输入微信 Provider ID）：
+              绑定微信（输入 Provider ID）：
             </div>
             <div className="flex gap-2">
               <input
@@ -104,7 +104,7 @@ function BindWechat() {
                 disabled={loading}
                 className="h-10 px-4 rounded-xl ritual-btn text-xs font-semibold disabled:opacity-60 whitespace-nowrap"
               >
-                {loading ? "绑定中..." : "模拟绑定"}
+                {loading ? "绑定中..." : "确认绑定"}
               </button>
             </div>
           </form>

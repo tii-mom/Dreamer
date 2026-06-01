@@ -1,6 +1,14 @@
 import { createHash } from "node:crypto";
 import type { UserProfile, PaymentRecord } from "../domain";
-import { getUser, updateUser, devStore, getD1, nowIso } from "./xms-store.server";
+import {
+  getUser,
+  updateUser,
+  devStore,
+  getD1,
+  nowIso,
+  markPaymentEntitlementApplied,
+} from "./xms-store.server";
+import { executeBlindboxDraw } from "./xms-blindbox-draw.server";
 
 type PaymentRow = PaymentRecord & {
   entitlement_applied?: number;
@@ -20,30 +28,8 @@ function normalizePaymentRow(row: PaymentRow | null | undefined): PaymentRecord 
   } as PaymentRecord;
 }
 
-// Define first-version products registry
-export const PRODUCTS_REGISTRY: Record<string, { code: string; name: string; priceCents: number }> =
-  {
-    seal_unlock: {
-      code: "seal_unlock",
-      name: "解封命盘",
-      priceCents: 599,
-    },
-    operator_899: {
-      code: "operator_899",
-      name: "命铺经营者",
-      priceCents: 89900,
-    },
-    blindbox_single: {
-      code: "blindbox_single",
-      name: "命师盲盒单抽",
-      priceCents: 9900,
-    },
-    blindbox_ten: {
-      code: "blindbox_ten",
-      name: "命师盲盒十连抽",
-      priceCents: 88800,
-    },
-  };
+import { PRODUCTS } from "../products";
+export const PRODUCTS_REGISTRY = PRODUCTS;
 
 // Standard MD5 function utilizing Node.js native crypto via compatibility layer
 export function md5(input: string): string {
@@ -54,8 +40,9 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
   const db = env.DB;
   const now = new Date().toISOString();
 
-  // Ensure entitlement is applied only once
-  if (payment.entitlementApplied) {
+  // Atomic entitlement check: only proceed if we can mark entitlement as applied
+  const acquired = await markPaymentEntitlementApplied(env, payment.orderId);
+  if (!acquired) {
     console.log(`[Payment] Entitlement already applied for order ${payment.orderId}, skipping.`);
     return;
   }
@@ -127,89 +114,13 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
 
     case "blindbox_single":
     case "blindbox_ten": {
-      // Perform draw in memory or D1 and grant assets
-      const drawsCount = payment.productCode === "blindbox_ten" ? 10 : 1;
-      const results: Array<{ assetCode: string; rarity: string; assetType: string }> = [];
-
-      for (let i = 0; i < drawsCount; i++) {
-        const roll = Math.random() * 100;
-        let rarity = "normal";
-        let assetCode = "";
-        const assetType = "inscription";
-
-        if (roll < 5) {
-          rarity = "legendary";
-          assetCode = "tianji_rune";
-        } else if (roll < 20) {
-          rarity = "epic";
-          assetCode = "wuxu_rune";
-        } else if (roll < 50) {
-          rarity = "rare";
-          assetCode = "caibo_rune";
-        } else {
-          rarity = "normal";
-          assetCode = "taohua_rune";
-        }
-
-        results.push({ assetCode, rarity, assetType });
-
-        if (!db) {
-          const assetId = `ast_${crypto.randomUUID().slice(0, 8)}`;
-          devStore().userAssets.set(assetId, {
-            id: assetId,
-            userId: user.id,
-            assetType,
-            assetCode,
-            rarity,
-            quantity: 1,
-            level: 1,
-            locked: 0,
-          });
-        } else {
-          await db
-            .prepare(
-              `INSERT INTO user_assets 
-              (id, user_id, asset_type, asset_code, rarity) 
-              VALUES (?, ?, ?, ?, ?)`,
-            )
-            .bind(`ast_${crypto.randomUUID().slice(0, 8)}`, user.id, assetType, assetCode, rarity)
-            .run();
-        }
-      }
-
-      // Record blindbox draws
-      if (!db) {
-        devStore().blindboxDraws.set(payment.orderId, {
-          id: `drw_${crypto.randomUUID().slice(0, 8)}`,
-          userId: user.id,
-          paymentId: payment.id,
-          boxType: payment.productCode,
-          drawCount: drawsCount,
-          probabilityVersion: "v1.0",
-          resultJson: JSON.stringify(results),
-          referralCode: payment.referralCode || null,
-          operatorUserId: payment.operatorUserId || null,
-        });
-      } else {
-        await db
-          .prepare(
-            `INSERT INTO blindbox_draws
-            (id, user_id, payment_id, box_type, draw_count, probability_version, result_json, referral_code, operator_user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          )
-          .bind(
-            `drw_${crypto.randomUUID().slice(0, 8)}`,
-            user.id,
-            payment.id,
-            payment.productCode,
-            drawsCount,
-            "v1.0",
-            JSON.stringify(results),
-            payment.referralCode || null,
-            payment.operatorUserId || null,
-          )
-          .run();
-      }
+      await executeBlindboxDraw(env, {
+        userId: user.id,
+        paymentId: payment.id,
+        boxType: payment.productCode as "blindbox_single" | "blindbox_ten",
+        referralCode: payment.referralCode ?? null,
+        operatorUserId: payment.operatorUserId ?? null,
+      });
       break;
     }
   }
@@ -271,21 +182,6 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
         .run();
     }
   }
-
-  // Set entitlement applied flag
-  if (!db) {
-    const localPayment = devStore().payments.get(payment.orderId);
-    if (localPayment) {
-      localPayment.entitlementApplied = true;
-    }
-  } else {
-    await db
-      .prepare(
-        "UPDATE payments SET entitlement_applied = 1, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
-      )
-      .bind(payment.orderId)
-      .run();
-  }
 }
 
 export async function handleBufPayCallback(
@@ -317,7 +213,11 @@ export async function handleBufPayCallback(
     return new Response("ok", { status: 200 });
   }
 
-  const secretKey = env.BUFPAY_SECRET || env.SESSION_SECRET || "MOCK_SECRET";
+  const secretKey = env.BUFPAY_SECRET;
+  if (!secretKey) {
+    console.error("[Payment Callback] BUFPAY_SECRET not configured");
+    return new Response("Server Configuration Error", { status: 500 });
+  }
   const calculatedSign = md5(`${aoid}${orderId}${orderUid}${price}${payPrice}${secretKey}`);
 
   if (sign.toLowerCase() !== calculatedSign) {
@@ -358,6 +258,11 @@ export async function handleBufPayCallback(
     return new Response("ok", { status: 200 });
   }
 
+  if (payment.aoid && payment.aoid !== aoid) {
+    console.error("[Payment Callback] AOID mismatch. Expected:", payment.aoid, "Received:", aoid);
+    return new Response("ok", { status: 200 });
+  }
+
   if (payment.displayPrice !== price) {
     console.error(
       "[Payment Callback] Price mismatch. Expected:",
@@ -365,6 +270,22 @@ export async function handleBufPayCallback(
       "Received:",
       price,
     );
+    return new Response("ok", { status: 200 });
+  }
+
+  // Store raw callback data
+  if (db) {
+    await db
+      .prepare(
+        "UPDATE payments SET callback_raw_json = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?",
+      )
+      .bind(bodyText, orderId)
+      .run();
+  }
+
+  // Skip if already in terminal state
+  if (payment.status === "success" || payment.status === "mock_success") {
+    console.log("[Payment Callback] Duplicate callback for terminal order:", orderId);
     return new Response("ok", { status: 200 });
   }
 
@@ -385,7 +306,7 @@ export async function handleBufPayCallback(
       .run();
   }
 
-  // Apply entitlement
+  // Apply entitlement (idempotent via atomic markPaymentEntitlementApplied)
   await applyPaymentEntitlement(env, payment);
 
   return new Response("ok", { status: 200 });
@@ -399,9 +320,14 @@ export async function handleMockPaymentSuccess(
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const isMockEnabled = env.BUFPAY_MOCK === "true" || !env.BUFPAY_SECRET;
+  // Only allow mock in dev/preview with explicit BUFPAY_MOCK=true
+  const isProd =
+    env.APP_BASE_URL &&
+    !env.APP_BASE_URL.includes("localhost") &&
+    !env.APP_BASE_URL.includes("127.0.0.1");
+  const isMockEnabled = env.BUFPAY_MOCK === "true" && !isProd;
   if (!isMockEnabled) {
-    return new Response("Forbidden in production", { status: 403 });
+    return new Response("Forbidden", { status: 403 });
   }
 
   let body: { orderId: string };

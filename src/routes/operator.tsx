@@ -43,7 +43,7 @@ function OperatorLanding() {
             <h3 className="font-display font-semibold text-sm">专属命铺链接</h3>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            生成独立归因链接与推广海报。所有通过此链接进入绑定微信或产生付费的朋友，均自动永久归因于您的专属命铺下。
+            生成独立归因链接与推广海报。活动归因期内，好友通过专属链接绑定微信或产生互动消费，会计入您的命铺香火值。
           </p>
         </div>
 

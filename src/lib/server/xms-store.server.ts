@@ -63,6 +63,8 @@ export type DevStore = {
     error?: string;
     createdAt: string;
   }>;
+  birthCharts: Map<string, Record<string, unknown>>;
+  botTickets: Map<string, Record<string, unknown>>;
 };
 
 export function devStore(): DevStore {
@@ -88,6 +90,8 @@ export function devStore(): DevStore {
       rewardLedger: new Map(),
       events: [],
       aiLogs: [],
+      birthCharts: new Map(),
+      botTickets: new Map(),
     };
   }
   return global.__xmsDevStore;
@@ -274,11 +278,14 @@ export async function getUserByRecoveryCode(env: CloudflareBindings, code: strin
   );
 }
 
-export async function createUser(env: CloudflareBindings) {
+export async function createUser(
+  env: CloudflareBindings,
+  options?: { id?: string; nickname?: string; source?: string },
+) {
   const user: UserProfile = {
-    id: randomId("usr"),
+    id: options?.id ?? randomId("usr"),
     recoveryCode: recoveryCode(),
-    nickname: "小天命",
+    nickname: options?.nickname ?? "小天命",
     level: "见习命师",
     qiyun: 1280,
     wallet: 66.6,

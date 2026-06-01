@@ -29,6 +29,13 @@ import {
   getPaymentByAoid,
 } from "./xms-store.server";
 import { generateMasterReply } from "./xms-ai.server";
+import {
+  isBirthText as isBirthTextImport,
+  parseBirthProfileFromText,
+  saveOrUpdateUserChart,
+  getOrCreateUserChart,
+} from "./xms-chart.server";
+const isBirthText = isBirthTextImport;
 import type {
   AppBootstrap,
   BirthProfile,
@@ -84,28 +91,6 @@ function onboardingMessages(user: UserProfile): ChatMsg[] {
       createdAt: nowIso(),
     },
   ];
-}
-
-function isBirthText(text: string) {
-  return /([12][0-9]{3}).{0,8}([01]?[0-9]).{0,4}([0-3]?[0-9])|出生|生日|八字|阳历|阴历|农历/.test(
-    text,
-  );
-}
-
-function profileFromText(text: string): BirthProfile | null {
-  const match = text.match(
-    /([12][0-9]{3})\D+([01]?[0-9])\D+([0-3]?[0-9])(?:\D+([0-2]?[0-9])\D*(?:点|时)?)?/,
-  );
-  if (!match) return null;
-  const [, year, month, day, hour] = match;
-  const date = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-  return {
-    calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
-    birthDate: date,
-    birthTime: hour ? `${hour.padStart(2, "0")}:00` : undefined,
-    gender: "unknown",
-    rawText: text,
-  };
 }
 
 function cardForTopic(
@@ -230,20 +215,40 @@ export async function handleUserMessage(
 
   let user = bootstrap.user;
   let birthProfile = bootstrap.birthProfile;
-  if (!birthProfile && isBirthText(text)) {
-    birthProfile = profileFromText(text) ?? {
-      calendarType: /阴历|农历/.test(text) ? "lunar" : "solar",
-      birthDate: todayKey(),
-      gender: "unknown",
-      rawText: text,
-    };
-    await saveBirthProfileRecord(env, user.id, birthProfile);
-    user = await updateUser(env, {
-      ...user,
-      sealUnlocked: Math.max(user.sealUnlocked, 30),
-      chartGlow: Math.max(user.chartGlow, 38),
-    });
+
+  // Handle birth info input → generate chart
+  if (isBirthText(text)) {
+    const parsed = parseBirthProfileFromText(text);
+    if (parsed) {
+      const shouldReplace =
+        !birthProfile ||
+        !birthProfile.birthTime ||
+        Boolean(parsed.birthTime) ||
+        parsed.rawText !== birthProfile.rawText;
+
+      if (shouldReplace) {
+        await saveBirthProfileRecord(env, user.id, parsed);
+        birthProfile = parsed;
+
+        if (parsed.birthTime) {
+          try {
+            await saveOrUpdateUserChart(env, user.id, parsed);
+          } catch {
+            // Chart generation failed — that's OK
+          }
+        }
+
+        user = await updateUser(env, {
+          ...user,
+          sealUnlocked: Math.max(user.sealUnlocked, 30),
+          chartGlow: Math.max(user.chartGlow, 38),
+        });
+      }
+    }
   }
+
+  // Get or create chart for prompt context
+  const chartContext = await getOrCreateUserChart(env, user.id, birthProfile);
 
   let daily = await getOrCreateDailyState(env, user);
   const consumesAsk = !/恢复码|分享|生成分享|出马申请/.test(text);
@@ -259,6 +264,7 @@ export async function handleUserMessage(
     env,
     user,
     birthProfile,
+    chartPromptSummary: chartContext.promptSummary,
     daily,
     history,
     userText: text,
@@ -314,6 +320,14 @@ export async function saveBirthProfile(
     sealUnlocked: 30,
     chartGlow: Math.max(bootstrap.user.chartGlow, 40),
   });
+  // Generate chart if possible (requires birth time)
+  if (profile.birthTime) {
+    try {
+      await saveOrUpdateUserChart(env, user.id, profile);
+    } catch {
+      // Ignore chart errors
+    }
+  }
   await logEvent(env, user.id, "birth_profile_saved", { calendarType: profile.calendarType });
   return { user, birthProfile: saved };
 }
@@ -465,43 +479,8 @@ export async function recordEvent(
   return { ok: true };
 }
 
-// Payment Service Implementations
 import { md5 } from "./xms-payment.server";
-
-const PRODUCTS = {
-  seal_unlock: {
-    name: "解封命盘",
-    priceCents: 599,
-  },
-  monthly_sub: {
-    name: "趋吉避凶 · 月令契约",
-    priceCents: 4999,
-  },
-  monthly_sub_30d: {
-    name: "趋吉避凶 · 月令契约 30 天",
-    priceCents: 4999,
-  },
-  shop_contract: {
-    name: "戏命出马 · 命铺契约",
-    priceCents: 89900,
-  },
-  operator_899: {
-    name: "命铺经营者",
-    priceCents: 89900,
-  },
-  blindbox_single: {
-    name: "单抽盲盒",
-    priceCents: 9900,
-  },
-  blindbox_ten: {
-    name: "十连盲盒",
-    priceCents: 88800,
-  },
-  qiyun_topup: {
-    name: "供奉香火",
-    priceCents: 0, // dynamic
-  },
-} as const;
+import { getProduct, formatPrice } from "../products";
 
 export async function createPaymentOrderService(
   context: unknown,
@@ -516,10 +495,7 @@ export async function createPaymentOrderService(
   const bootstrap = await ensureSessionFromToken(context, token);
   const user = bootstrap.user;
 
-  const product = PRODUCTS[input.productCode];
-  if (!product) {
-    throw new Error("商品不存在");
-  }
+  const product = getProduct(input.productCode);
 
   let priceCents = product.priceCents;
   if (input.productCode === "qiyun_topup") {
@@ -529,7 +505,7 @@ export async function createPaymentOrderService(
     priceCents = input.amountCents;
   }
 
-  const displayPrice = (priceCents / 100).toFixed(2);
+  const displayPrice = formatPrice(priceCents);
   const orderId = randomId("pay");
 
   // Read referral code from cookie
@@ -566,9 +542,21 @@ export async function createPaymentOrderService(
     operatorUserId,
   });
 
+  const isProd =
+    env.APP_BASE_URL &&
+    !env.APP_BASE_URL.includes("localhost") &&
+    !env.APP_BASE_URL.includes("127.0.0.1");
+
   const aid = env.BUFPAY_AID;
-  const secretKey = env.BUFPAY_SECRET || env.SESSION_SECRET || "MOCK_SECRET";
-  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+  const isMock = env.BUFPAY_MOCK === "true" && !isProd;
+
+  if (!isMock && !aid) {
+    throw new Error("BUFPAY_AID not configured");
+  }
+
+  if (!isMock && !env.BUFPAY_SECRET) {
+    throw new Error("BUFPAY_SECRET not configured");
+  }
 
   if (isMock) {
     // Return mock payment info
@@ -605,12 +593,16 @@ export async function createPaymentOrderService(
   }
 
   // Real production integration with BufPay
+  const bufpaySecret = env.BUFPAY_SECRET;
+  if (!bufpaySecret) {
+    throw new Error("BUFPAY_SECRET not configured");
+  }
   const notifyUrl = `${env.APP_BASE_URL || ""}/api/pay/callback`;
   const returnUrl = `${env.APP_BASE_URL || ""}/?pay_return=${orderId}`;
   const feedbackUrl = `${env.APP_BASE_URL || ""}/?pay_feedback=${orderId}`;
 
   // Signature calculation: name + pay_type + price + order_id + order_uid + notify_url + return_url + feedback_url + secret
-  const signString = `${product.name}${input.payType}${displayPrice}${orderId}${user.id}${notifyUrl}${returnUrl}${feedbackUrl}${secretKey}`;
+  const signString = `${product.name}${input.payType}${displayPrice}${orderId}${user.id}${notifyUrl}${returnUrl}${feedbackUrl}${bufpaySecret}`;
   const sign = md5(signString);
 
   const bodyParams = new URLSearchParams({
@@ -681,13 +673,8 @@ export async function queryPaymentStatusService(
     throw new Error("订单不存在");
   }
 
-  // If local status is already success, return it immediately
-  if (payment.status === "success" || payment.status === "mock_success") {
-    return { status: payment.status, priceCents: payment.priceCents };
-  }
-
   const aid = env.BUFPAY_AID;
-  const isMock = env.BUFPAY_MOCK === "true" || !aid;
+  const isMock = env.BUFPAY_MOCK === "true";
 
   // If not mock and we have an aoid, query BufPay API directly to sync in case callback was delayed
   if (
@@ -714,7 +701,6 @@ export async function queryPaymentStatusService(
             if (updated) {
               await applyPaymentEntitlement(env, updated);
             }
-            return { status: "success", priceCents: payment.priceCents };
           }
         } else if (data.status === "expire") {
           await updatePaymentStatus(env, payment.orderId, "expire");
@@ -727,5 +713,19 @@ export async function queryPaymentStatusService(
 
   // Refetch to return latest local status
   const current = await getPaymentByOrderId(env, input.orderId);
-  return { status: current?.status || payment.status, priceCents: payment.priceCents };
+
+  // Look up latest blindbox drawId for this order
+  let latestDrawId: string | null = null;
+  if (current && (current.status === "success" || current.status === "mock_success")) {
+    if (current.productCode === "blindbox_single" || current.productCode === "blindbox_ten") {
+      const { getLatestDrawIdByPayment } = await import("./xms-blindbox-draw.server");
+      latestDrawId = await getLatestDrawIdByPayment(env, current.id);
+    }
+  }
+
+  return {
+    status: current?.status || payment.status,
+    priceCents: payment.priceCents,
+    latestDrawId,
+  };
 }

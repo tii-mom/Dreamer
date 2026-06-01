@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { MasterAvatar } from "./MasterAvatar";
 import { quickAsk } from "@/lib/mock-data";
 import type { CardPayload, ChatMsg, DailyState, UserProfile } from "@/lib/domain";
@@ -372,7 +373,7 @@ function CardMessage({
         {pct < 100 && (
           <div className="mt-3 flex gap-2 flex-wrap">
             <button onClick={onUnlockSeal} className="text-xs px-3 h-8 rounded-lg ritual-btn">
-              暂不收款 · 模拟解封
+              解封命盘 ¥5.99
             </button>
             <button
               onClick={() => onOpenModal("share")}
@@ -458,7 +459,7 @@ function CardMessage({
         <div className="grid grid-cols-3 gap-2 mb-3">
           <Mini label="候补状态" value={status === "none" ? "未申请" : "排队中"} />
           <Mini label="建议客单" value="¥30-99" accent />
-          <Mini label="模拟毛利" value="高" accent />
+          <Mini label="推荐客单" value="高" accent />
         </div>
         <button
           onClick={() => onOpenModal("earn")}
@@ -484,14 +485,14 @@ function CardMessage({
             onClick={() => onOpenModal("box")}
             className="text-xs px-3 h-8 rounded-lg ritual-btn flex-1"
           >
-            模拟单抽
+            抽取铭文
           </button>
-          <button
-            onClick={() => onOpenModal("box")}
-            className="text-xs px-3 h-8 rounded-lg bg-secondary/70 border border-gold/20 text-bone hover:border-gold/50 transition-colors"
+          <Link
+            to="/blindbox"
+            className="text-xs px-3 h-8 rounded-lg bg-secondary/70 border border-gold/20 text-bone hover:border-gold/50 transition-colors inline-flex items-center"
           >
-            概率
-          </button>
+            商店
+          </Link>
         </div>
       </div>
     );

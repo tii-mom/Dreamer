@@ -6,6 +6,9 @@ import {
 import {
   getUser,
   createUser,
+  getBirthProfile,
+  saveBirthProfileRecord,
+  updateUser,
   devStore,
   nowIso,
   todayKey,
@@ -14,6 +17,16 @@ import {
 import { generateMasterReply } from "./xms-ai.server";
 import { getAssetUrl } from "@/lib/assets/asset-url";
 import type { AssetVariant } from "@/lib/assets/asset-types";
+import { parseIntent, isMenuRequest, setMenuSession } from "@/lib/bot/command-parser";
+import { renderMenu } from "@/lib/bot/render-menu";
+import type { BotIntent } from "@/lib/bot/actions";
+import { createBotTicket } from "./xms-ticket.server";
+import {
+  isBirthText,
+  parseBirthProfileFromText,
+  saveOrUpdateUserChart,
+  getOrCreateUserChart,
+} from "./xms-chart.server";
 
 export type BotMessage = {
   id: string;
@@ -64,6 +77,27 @@ export async function logBotMessage(
     .run();
 }
 
+async function buildTicketUrl(
+  env: CloudflareBindings,
+  user: { id: string },
+  providerUserId: string,
+  scene: string,
+  path: string,
+): Promise<string> {
+  const baseUrl = env.APP_BASE_URL || "https://bige.life";
+  try {
+    const ticket = await createBotTicket(env, {
+      userId: user.id,
+      provider: "clawbot",
+      providerUserId,
+      scene,
+    });
+    return `${baseUrl}${path}?ticket=${ticket.ticket}`;
+  } catch {
+    return `${baseUrl}${path}`;
+  }
+}
+
 export async function handleBotMessage(
   env: CloudflareBindings,
   providerUserId: string,
@@ -75,12 +109,13 @@ export async function handleBotMessage(
   let user = binding ? await getUser(env, binding.userId) : null;
 
   if (!binding || !user) {
-    // Create guest user
-    const guestId = `usr_${crypto.randomUUID().slice(0, 8)}`;
-    user = await createUser(env, guestId, `微信道友_${providerUserId.slice(-4)}`);
+    user = await createUser(env, {
+      nickname: `微信道友_${providerUserId.slice(-4)}`,
+      source: "clawbot",
+    });
     binding = {
       id: `bin_${crypto.randomUUID().slice(0, 8)}`,
-      userId: guestId,
+      userId: user.id,
       provider: "clawbot",
       providerUserId,
       status: "active",
@@ -94,19 +129,51 @@ export async function handleBotMessage(
   const incomingId = `msg_in_${crypto.randomUUID().slice(0, 8)}`;
   const text = content.trim();
 
-  // 3. Intent Detection
-  let intent = "chat";
-  if (/今日|运势|流日/.test(text)) intent = "daily";
-  else if (/感情|姻缘|复合|对象/.test(text)) intent = "love";
-  else if (/财|钱|副业|收入/.test(text)) intent = "money";
-  else if (/工作|事业|老板|合作|跳槽/.test(text)) intent = "work";
-  else if (/抽签|签/.test(text)) intent = "draw";
-  else if (/盲盒|抽/.test(text)) intent = "blindbox";
-  else if (/铭文|装备/.test(text)) intent = "inscription";
-  else if (/命铺|经营|掌柜|899/.test(text)) intent = "operator";
-  else if (/推广|朋友圈|文案|生成图/.test(text)) intent = "promo";
-  else if (/我的|背包|账户|资产/.test(text)) intent = "my";
-  else if (/帮助|help|菜单/.test(text)) intent = "help";
+  // 3. Check if operator
+  const db = env.DB;
+  let isOperator = false;
+  if (db) {
+    const op = await db
+      .prepare("SELECT id FROM operators WHERE user_id = ? AND status = 'active' LIMIT 1")
+      .bind(user.id)
+      .first<{ id: string }>();
+    isOperator = !!op;
+  } else {
+    isOperator = devStore().operators.has(user.id);
+  }
+
+  // 4. Check for menu request
+  if (isMenuRequest(text)) {
+    setMenuSession(user.id);
+    const replyText = renderMenu(isOperator);
+    await logBotMessage(env, {
+      id: incomingId,
+      userId: user.id,
+      bindingId: binding.id,
+      channel: "clawbot",
+      direction: "in",
+      messageType: "text",
+      content: text,
+      intent: "help",
+      rawJson: JSON.stringify(rawPayload),
+    });
+    const outgoingId = `msg_out_${crypto.randomUUID().slice(0, 8)}`;
+    await logBotMessage(env, {
+      id: outgoingId,
+      userId: user.id,
+      bindingId: binding.id,
+      channel: "clawbot",
+      direction: "out",
+      messageType: "text",
+      content: replyText,
+      intent: "help",
+      rawJson: JSON.stringify({ sent: true }),
+    });
+    return replyText;
+  }
+
+  // 5. Parse intent using new command system
+  const intent = parseIntent(text, user.id, isOperator) ?? "chat";
 
   await logBotMessage(env, {
     id: incomingId,
@@ -120,7 +187,7 @@ export async function handleBotMessage(
     rawJson: JSON.stringify(rawPayload),
   });
 
-  // 4. Generate Reply based on intent
+  // 6. Generate Reply based on intent
   let replyText = "";
   const daily = await getOrCreateDailyState(env, user);
   const baseUrl = env.APP_BASE_URL || "https://bige.life";
@@ -129,19 +196,8 @@ export async function handleBotMessage(
 
   switch (intent) {
     case "help":
-      replyText =
-        `🔮 戏命师微信指令秘籍：\n\n` +
-        `【今日】查看今日运势与避坑建议\n` +
-        `【感情】问姻缘与桃花局\n` +
-        `【财运】问今日财气与起运\n` +
-        `【工作】问事业与谈判窗口\n` +
-        `【抽签】叩问灵签、解惑吉凶\n` +
-        `【盲盒】开启命师盲盒入口\n` +
-        `【铭文】查看装配的命盘铭文\n` +
-        `【命铺】查看 ¥899 命铺经营者详情\n` +
-        `【推广】经营者获取今日朋友圈推广素材\n` +
-        `【我的】查看账户与当前命理资产\n\n` +
-        `直接发送其他任何内容，戏命师会替你拆盘推演。`;
+      setMenuSession(user.id);
+      replyText = renderMenu(isOperator);
       break;
 
     case "daily":
@@ -155,37 +211,52 @@ export async function handleBotMessage(
         `回「抽签」求取今日灵签保护；回「盲盒」抽取财运铭文加成。`;
       break;
 
-    case "my":
+    case "my": {
+      // Determine actual chart status
+      const bp = await getBirthProfile(env, user.id);
+      const chartContext = bp ? await getOrCreateUserChart(env, user.id, bp) : null;
+      const chartStatus = chartContext?.chart
+        ? "已起盘"
+        : bp?.birthTime
+          ? "排盘失败（请重新输入完整出生信息）"
+          : bp
+            ? "未补全出生时辰"
+            : "未提交出生资料";
       replyText =
         `☯️ 你的命理账户：\n` +
         `代号：${user.nickname}\n` +
         `气运：${user.qiyun}\n` +
         `级别：${user.level}\n` +
         `命盘状态：${user.sealUnlocked}% 解封\n` +
-        `经营者：${user.shopOpen ? "已激活" : "未开通"}\n\n` +
+        `经营者：${user.shopOpen ? "已激活" : "未开通"}\n` +
+        `命盘：${chartStatus}\n\n` +
         `绑定恢复码：${user.recoveryCode}\n(请妥善保存，在网页端输入可同步此微信数据)`;
       break;
+    }
 
-    case "blindbox":
+    case "blindbox": {
+      const ticketUrl = await buildTicketUrl(env, user, providerUserId, "blindbox", "/wx/blindbox");
       replyText =
         `🎴 命师盲盒池：\n` +
         `首版支持单抽(¥99)与十连抽(¥888)。\n` +
         `抽取稀有命师与强力铭文，增强微信戏命师属性！\n\n` +
         `【盲盒预览图】\n${publicAssetUrl("blind_box.box.standard", "box")}\n\n` +
-        `👉 复制下方链接在浏览器中打开抽卡：\n` +
-        `${baseUrl}/blindbox?uid=${user.id}`;
+        `👉 打开链接进入抽卡：\n${ticketUrl}`;
       break;
+    }
 
-    case "inscription":
+    case "inscription": {
+      const ticketUrl = await buildTicketUrl(env, user, providerUserId, "assets", "/wx/assets");
       replyText =
         `📜 铭文装配包：\n` +
-        `你当前装配 the 铭文会直接改变微信戏命师的推演风格与能力加成。\n\n` +
+        `你当前装配的铭文会直接改变微信戏命师的推演风格与能力加成。\n\n` +
         `【铭文预览图】\n${publicAssetUrl("rune.gold.01", "icon")}\n\n` +
-        `👉 查看并管理你的铭文装配：\n` +
-        `${baseUrl}/assets?uid=${user.id}`;
+        `👉 查看并管理你的铭文装配：\n${ticketUrl}`;
       break;
+    }
 
-    case "operator":
+    case "operator": {
+      const ticketUrl = await buildTicketUrl(env, user, providerUserId, "operator", "/wx/operator");
       replyText =
         `🏮 成为戏命铺经营者：\n` +
         `只需 ¥899/月 开通专属经营者特权，建立你自己的朋友圈命铺。\n` +
@@ -193,12 +264,11 @@ export async function handleBotMessage(
         `- 自动统计转化，赚取平台活动香火值奖励。\n` +
         `- 铭文装配位直接 +2。\n\n` +
         `【命铺经营者分享图】\n${publicAssetUrl("share.earn", "mobile")}\n\n` +
-        `👉 立即开通命铺经营者：\n` +
-        `${baseUrl}/operator?uid=${user.id}`;
+        `👉 立即开通命铺经营者：\n${ticketUrl}`;
       break;
+    }
 
     case "promo": {
-      const db = env.DB;
       let op = null;
       if (db) {
         op = await db
@@ -224,12 +294,50 @@ export async function handleBotMessage(
       break;
     }
 
+    case "earnings": {
+      replyText =
+        `📊 经营收益概览：\n` +
+        `请访问命铺面板查看详细数据。\n\n` +
+        `👉 ${baseUrl}/operator/dashboard`;
+      break;
+    }
+
+    case "draw":
+      replyText =
+        `🎋 灵签抽测：\n` +
+        `请回复你想问的事情，戏命师将为你抽取灵签（功能即将上线）。\n\n` +
+        `暂时请直接描述你的问题，戏命师会直接替你拆盘。`;
+      break;
+
     default: {
       try {
+        // Handle birth info if present
+        let bp = await getBirthProfile(env, user.id);
+
+        if (isBirthText(text)) {
+          const parsed = parseBirthProfileFromText(text);
+          if (parsed) {
+            bp = await saveBirthProfileRecord(env, user.id, parsed);
+            try {
+              await saveOrUpdateUserChart(env, user.id, parsed);
+            } catch {
+              // Missing birth time is OK
+            }
+            user = await updateUser(env, {
+              ...user,
+              sealUnlocked: Math.max(user.sealUnlocked, 30),
+              chartGlow: Math.max(user.chartGlow, 38),
+            });
+          }
+        }
+
+        const chartContext = await getOrCreateUserChart(env, user.id, bp);
+
         const aiRes = await generateMasterReply({
           env,
           user,
-          birthProfile: null,
+          birthProfile: bp,
+          chartPromptSummary: chartContext.promptSummary,
           daily,
           history: [],
           userText: text,
@@ -242,7 +350,7 @@ export async function handleBotMessage(
     }
   }
 
-  // 5. Persist outgoing message
+  // 7. Persist outgoing message
   const outgoingId = `msg_out_${crypto.randomUUID().slice(0, 8)}`;
   await logBotMessage(env, {
     id: outgoingId,
@@ -271,7 +379,6 @@ export async function clawbotWebhookHandler(
   // Signature validation
   try {
     if (request.method === "POST") {
-      // Clone request to read body text for verification
       const cloned = request.clone();
       bodyText = await cloned.text();
       rawPayload = JSON.parse(bodyText);

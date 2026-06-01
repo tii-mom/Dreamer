@@ -114,9 +114,6 @@ export const createPaymentOrder = createServerFn({ method: "POST" })
     z.object({
       productCode: z.enum([
         "seal_unlock",
-        "monthly_sub",
-        "monthly_sub_30d",
-        "shop_contract",
         "operator_899",
         "blindbox_single",
         "blindbox_ten",
@@ -134,4 +131,24 @@ export const queryPaymentStatus = createServerFn({ method: "POST" })
   .inputValidator(z.object({ orderId: z.string().min(1) }))
   .handler(async ({ context, data }) => {
     return queryPaymentStatusService(context, token(), data);
+  });
+
+export const verifyTicket = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ ticket: z.string().min(1) }))
+  .handler(async ({ context, data }) => {
+    const env = getRuntimeEnv(context);
+    const { consumeBotTicket } = await import("../server/xms-ticket.server");
+    const { createSession } = await import("../server/xms-store.server");
+    const ticketData = await consumeBotTicket(env, data.ticket);
+    if (!ticketData) {
+      return { valid: false, reason: "ticket_expired" } as const;
+    }
+    const session = await createSession(env, ticketData.userId);
+    writeSessionCookie(session.token);
+    return {
+      valid: true,
+      userId: ticketData.userId,
+      provider: ticketData.provider,
+      scene: ticketData.scene,
+    } as const;
   });

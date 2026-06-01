@@ -130,6 +130,19 @@ function LandingPage() {
           </div>
         </div>
         <p className="text-[10px] text-muted-foreground/40">© 2026 戏命师 all rights reserved.</p>
+        <p className="text-[8px] text-muted-foreground/30 max-w-md mx-auto leading-relaxed mt-2">
+          本产品部分紫微斗数排盘算法与样本数据参考/使用：紫微斗数开源样本数据集 v3.0（518,400 条）
+          来源：
+          <a
+            href="https://github.com/Renhuai123/ziwei-doushu"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-gold"
+          >
+            https://github.com/Renhuai123/ziwei-doushu
+          </a>
+          作者：王多鱼AI
+        </p>
       </footer>
     </div>
   );
