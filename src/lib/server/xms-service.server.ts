@@ -532,6 +532,24 @@ export async function createPaymentOrderService(
   const displayPrice = (priceCents / 100).toFixed(2);
   const orderId = randomId("pay");
 
+  // Read referral code from cookie
+  let referralCode: string | null = null;
+  let operatorUserId: string | null = null;
+  try {
+    const { getCookie: getCookieServer } = await import("@tanstack/react-start/server");
+    referralCode = getCookieServer("referral_code") || null;
+    if (referralCode) {
+      // Find operator by referral code to store the operator_user_id
+      const { getOperatorByReferralCode } = await import("./xms-operator.server");
+      const operator = await getOperatorByReferralCode(env, referralCode);
+      if (operator) {
+        operatorUserId = operator.userId;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to read referral cookie in createPaymentOrderService:", err);
+  }
+
   // Create local record as pending
   const localRecord = await createPaymentRecord(env, {
     id: randomId("payrec"),
@@ -544,6 +562,8 @@ export async function createPaymentOrderService(
     displayPrice,
     status: "pending",
     entitlementApplied: false,
+    referralCode,
+    operatorUserId,
   });
 
   const aid = env.BUFPAY_AID;

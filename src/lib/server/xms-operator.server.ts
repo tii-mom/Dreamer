@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { devStore, getD1, nowIso } from "./xms-store.server";
 
 export type Operator = {
@@ -138,7 +139,38 @@ export async function recordReferralVisit(
   const now = new Date().toISOString();
   const id = `ref_${crypto.randomUUID().slice(0, 8)}`;
 
+  // Compute real hashes for IP and UA
+  let ipHash: string | null = null;
+  let uaHash: string | null = null;
+  try {
+    if (ip) {
+      ipHash = createHash("sha256").update(ip).digest("hex");
+    }
+    if (ua) {
+      uaHash = createHash("sha256").update(ua).digest("hex");
+    }
+  } catch (err) {
+    console.error("Failed to hash IP or UA:", err);
+  }
+
   if (!db) {
+    // Check duplicates in memory store
+    let existInMemory = false;
+    for (const ref of devStore().operatorReferrals.values()) {
+      if (ref.referralCode === referralCode) {
+        if (inviteeUserId && ref.inviteeUserId === inviteeUserId) {
+          existInMemory = true;
+          break;
+        }
+        if (!inviteeUserId && ref.ipHash === ipHash && ref.uaHash === uaHash) {
+          existInMemory = true;
+          break;
+        }
+      }
+    }
+
+    if (existInMemory) return;
+
     devStore().operatorReferrals.set(id, {
       id,
       operatorUserId: operator.userId,
@@ -148,8 +180,8 @@ export async function recordReferralVisit(
       firstTouchAt: now,
       totalPaidCents: 0,
       status: "visited",
-      ipHash: ip,
-      uaHash: ua,
+      ipHash,
+      uaHash,
     });
 
     // Increment operator total invites
@@ -158,12 +190,22 @@ export async function recordReferralVisit(
   }
 
   // Check if this visitor has already visited to prevent duplicate count
-  const exist = await db
-    .prepare(
-      "SELECT id FROM operator_referrals WHERE referral_code = ? AND invitee_user_id = ? LIMIT 1",
-    )
-    .bind(referralCode, inviteeUserId || "")
-    .first();
+  let exist = null;
+  if (inviteeUserId) {
+    exist = await db
+      .prepare(
+        "SELECT id FROM operator_referrals WHERE referral_code = ? AND invitee_user_id = ? LIMIT 1",
+      )
+      .bind(referralCode, inviteeUserId)
+      .first();
+  } else if (ipHash && uaHash) {
+    exist = await db
+      .prepare(
+        "SELECT id FROM operator_referrals WHERE referral_code = ? AND invitee_user_id IS NULL AND ip_hash = ? AND ua_hash = ? LIMIT 1",
+      )
+      .bind(referralCode, ipHash, uaHash)
+      .first();
+  }
 
   if (exist) return;
 
@@ -181,8 +223,8 @@ export async function recordReferralVisit(
       "web",
       now,
       "visited",
-      ip || null,
-      ua || null,
+      ipHash,
+      uaHash,
     )
     .run();
 

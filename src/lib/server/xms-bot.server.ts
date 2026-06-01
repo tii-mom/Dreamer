@@ -1,4 +1,8 @@
-import { getBindingByProviderUser, createWechatBinding } from "./xms-wechat.server";
+import {
+  getBindingByProviderUser,
+  createWechatBinding,
+  verifyClawbotSignature,
+} from "./xms-wechat.server";
 import {
   getUser,
   createUser,
@@ -261,23 +265,33 @@ export async function clawbotWebhookHandler(
 ): Promise<Response> {
   let providerUserId = "";
   let content = "";
-  let rawPayload = null;
+  let rawPayload: Record<string, unknown> | null = null;
+  let bodyText = "";
 
+  // Signature validation
   try {
     if (request.method === "POST") {
-      const body = (await request.json()) as Record<string, unknown>;
-      providerUserId = String(body.provider_user_id || body.from || "");
-      content = String(body.content || body.text || "");
-      rawPayload = body;
+      // Clone request to read body text for verification
+      const cloned = request.clone();
+      bodyText = await cloned.text();
+      rawPayload = JSON.parse(bodyText);
+      providerUserId = String(rawPayload?.provider_user_id || rawPayload?.from || "");
+      content = String(rawPayload?.content || rawPayload?.text || "");
     } else {
       const url = new URL(request.url);
       providerUserId =
         url.searchParams.get("provider_user_id") || url.searchParams.get("from") || "";
       content = url.searchParams.get("content") || url.searchParams.get("text") || "";
       rawPayload = Object.fromEntries(url.searchParams);
+      bodyText = url.searchParams.toString();
+    }
+
+    if (!verifyClawbotSignature(request, env, bodyText)) {
+      console.error("[Webhook Handler] ClawBot signature verification failed.");
+      return new Response("Unauthorized signature", { status: 401 });
     }
   } catch (err) {
-    return new Response("Invalid request format", { status: 400 });
+    return new Response("Invalid request format or payload", { status: 400 });
   }
 
   if (!providerUserId || !content) {

@@ -187,13 +187,15 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
           drawCount: drawsCount,
           probabilityVersion: "v1.0",
           resultJson: JSON.stringify(results),
+          referralCode: payment.referralCode || null,
+          operatorUserId: payment.operatorUserId || null,
         });
       } else {
         await db
           .prepare(
-            `INSERT INTO blindbox_draws 
-            (id, user_id, payment_id, box_type, draw_count, probability_version, result_json) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO blindbox_draws
+            (id, user_id, payment_id, box_type, draw_count, probability_version, result_json, referral_code, operator_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           )
           .bind(
             `drw_${crypto.randomUUID().slice(0, 8)}`,
@@ -203,10 +205,70 @@ export async function applyPaymentEntitlement(env: CloudflareBindings, payment: 
             drawsCount,
             "v1.0",
             JSON.stringify(results),
+            payment.referralCode || null,
+            payment.operatorUserId || null,
           )
           .run();
       }
       break;
+    }
+  }
+
+  // Handle Operator Conversion Attribution
+  // Skip if operator is buying for themselves to prevent self-referral abuse
+  if (payment.referralCode && payment.operatorUserId && payment.operatorUserId !== payment.userId) {
+    const payPriceCents = payment.payPriceCents || payment.priceCents;
+
+    // Divide price by 100 to get dollar value, 1 Yuan = 1 incense value
+    const newIncenseValue = Math.floor(payPriceCents / 100);
+
+    if (!db) {
+      // Memory Store logic
+      // Find operator referral record for this invitee and update
+      for (const refObj of devStore().operatorReferrals.values()) {
+        if (
+          refObj.referralCode === payment.referralCode &&
+          refObj.inviteeUserId === payment.userId
+        ) {
+          refObj.convertedAt = now;
+          refObj.firstPaymentId = payment.id;
+          refObj.totalPaidCents = (Number(refObj.totalPaidCents) || 0) + payPriceCents;
+          refObj.status = "converted";
+        }
+      }
+
+      // Update operator dashboard counters
+      const opObj = devStore().operators.get(payment.operatorUserId);
+      if (opObj) {
+        opObj.totalConversions = (Number(opObj.totalConversions) || 0) + 1;
+        opObj.totalPaidCents = (Number(opObj.totalPaidCents) || 0) + payPriceCents;
+        opObj.incenseValue = (Number(opObj.incenseValue) || 0) + newIncenseValue;
+        opObj.updatedAt = now;
+      }
+    } else {
+      // D1 SQL logic
+      // 1. Update the referral status to converted
+      await db
+        .prepare(
+          `UPDATE operator_referrals
+          SET converted_at = ?, first_payment_id = ?, total_paid_cents = total_paid_cents + ?, status = 'converted'
+          WHERE referral_code = ? AND invitee_user_id = ?`,
+        )
+        .bind(now, payment.id, payPriceCents, payment.referralCode, payment.userId)
+        .run();
+
+      // 2. Update operator statistics
+      await db
+        .prepare(
+          `UPDATE operators
+          SET total_conversions = total_conversions + 1,
+              total_paid_cents = total_paid_cents + ?,
+              incense_value = incense_value + ?,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE user_id = ?`,
+        )
+        .bind(payPriceCents, newIncenseValue, payment.operatorUserId)
+        .run();
     }
   }
 
