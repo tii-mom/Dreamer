@@ -66,6 +66,9 @@
 | 0004 | `migrations/0004_wechat_operator_tables.sql` | 微信/经营者/资产/盲盒表 |
 | 0005 | `migrations/0005_fix_payments_referral_fields.sql` | payments 扩展字段 |
 | 0006 | `migrations/0006_add_bot_tickets.sql` | bot_tickets 表（新增） |
+| 0007 | `migrations/0007_add_birth_charts.sql` | birth_charts 表 |
+| 0008 | `migrations/0008_add_bot_bind_tickets.sql` | bot_bind_tickets 表 |
+| 0009 | `migrations/0009_add_master_agents.sql` | Hermes-like Master Agent 表 |
 
 ## 4. 新增环境变量列表
 
@@ -78,6 +81,8 @@
 | `BUFPAY_MOCK` | 设为 `true` 启用模拟支付（仅非生产） | 否 |
 | `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | 是 |
 | `ADMIN_TOKEN` | 后台管理 token | 推荐 |
+
+MVP 主线不需要 `OPENCLAW_BOT_TOKEN`。Dreamer 使用 ClawBot webhook 直连，不运行腾讯云长轮询 Bridge。
 
 ## 5. 本地运行方式
 
@@ -131,6 +136,8 @@ x-clawbot-signature: <hmac_sha256_hex>
 签名原文：`timestamp + "." + nonce + "." + rawBody`
 签名算法：`HMAC-SHA256(payload, CLAWBOT_WEBHOOK_SECRET)`
 
+消息进入 Dreamer 后，会通过 `provider_user_id` 解析绑定用户，并加载该用户的 active master agent。ClawBot / OpenClaw 只作为微信通道层；戏命师的人设、技能、记忆、命盘和权益由 Dreamer 内部 Hermes-like Master Agent Runtime 承载。
+
 ## 9. 测试账号
 
 | 角色 | provider_user_id | 说明 |
@@ -162,13 +169,14 @@ x-clawbot-signature: <hmac_sha256_hex>
 
 ## 13. 仍未完成的后续事项
 
-1. 盲盒支付成功 → 自动跳转结果页（需 PaymentPanel 回调带回 drawId）
-2. 月订阅功能完善（`monthly_sub` 作为未来 SKU）
-3. 经营者提现功能（首版不涉及真实现金返佣）
-4. 铭文市场交易（首版不做复杂市场）
-5. 多级分销（首版不做）
-6. 真实微信扫描二维码绑定流程（当前使用 Provider ID 模拟）
-7. 微信内 H5 分享卡片自动生成
-8. 盲盒开盒动画优化（序列帧仅在微信内加载）
-9. 经营者 D1 数据最近访问记录明细查询 API
-10. Cron 定时任务（当前为占位）
+1. Master Agent Lite：默认 agent、记忆、技能状态、prompt 注入。
+2. 盲盒支付成功 → 自动跳转结果页（需 PaymentPanel 回调带回 drawId）
+3. 月订阅功能完善（`monthly_sub` 作为未来 SKU）
+4. 经营者提现功能（首版不涉及真实现金返佣）
+5. 铭文市场交易（首版不做复杂市场）
+6. 多级分销（首版不做）
+7. 真实微信扫描二维码绑定流程（当前使用 Provider ID 模拟）
+8. 微信内 H5 分享卡片自动生成
+9. 盲盒开盒动画优化（序列帧仅在微信内加载）
+10. 经营者 D1 数据最近访问记录明细查询 API
+11. Cron 定时任务（当前为占位）

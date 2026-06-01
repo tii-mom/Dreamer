@@ -1,26 +1,44 @@
 # XMS ClawBot Bridge — 运维文档
 
+> 当前状态：备用方案，不是 MVP 主线。
+>
+> MVP 采用 ClawBot webhook 直连 Dreamer：`POST /api/bot/clawbot/webhook`。这种模式不需要 `OPENCLAW_BOT_TOKEN`，也不需要腾讯云常驻 Bridge。Bridge 只在 ClawBot webhook 不可用、必须由服务器主动长轮询 iLink / OpenClaw 时启用。
+
 ## 1. 为什么需要 ClawBot Bridge
 
-ClawBot (OpenClaw / iLink) 的微信消息通道需要常驻进程通过长轮询 `POST getupdates` 接收消息，再通过 `sendmessage` 回复。Cloudflare Workers 是无状态的边缘计算平台，不支持持久的常驻连接。
+当 ClawBot webhook 可用时，不需要 Bridge。ClawBot 平台会主动把微信消息 POST 到 Dreamer Worker。
+
+只有在 webhook 不可用、必须通过 OpenClaw / iLink 长轮询 `POST getupdates` 接收消息，再通过 `sendmessage` 回复时，才需要 Bridge。Cloudflare Workers 是无状态的边缘计算平台，不适合持久轮询，因此备用方案需要一台常驻服务器运行 Bridge。
 
 因此需要一台常驻服务器（推荐腾讯云 CVM）运行 Bridge 进程，负责微信消息的收发。
 
 ## 2. 架构
 
+MVP 主线：
+
+```text
+微信用户
+  ↓
+ClawBot / OpenClaw webhook
+  ↓ POST /api/bot/clawbot/webhook
+Dreamer Worker
+  ↓ Master Agent Runtime
+DeepSeek / 紫微排盘 / 支付 / 盲盒 / 经营者
 ```
+
+备用 Bridge：
+
+```text
 微信用户 ↔ iLink / OpenClaw API
            ↓ POST getupdates (长轮询)
           clawbot-bridge (腾讯云 CVM)
            ↓ POST /api/bot/clawbot/ingest (HMAC 签名)
-          Dreamer Worker (Cloudflare Workers)
-           ↓ handleBotMessage
-          DeepSeek / 紫微排盘 / 支付 / 盲盒 / 经营者
+          Dreamer Worker
 ```
 
-- Dreamer 主服务继续跑 Cloudflare Workers（无状态、全球边缘）
-- Bridge 只跑腾讯云（长连接、状态保持）
-- Bridge 不包含任何业务逻辑
+- Dreamer 主服务继续跑 Cloudflare Workers。
+- Dreamer 内部 Hermes-like Master Agent Runtime 承载戏命师人设、技能、记忆、命盘和权益。
+- Bridge 不包含任何戏命师业务逻辑，仅作为备用消息通道。
 
 ## 3. 当前 API Base
 
