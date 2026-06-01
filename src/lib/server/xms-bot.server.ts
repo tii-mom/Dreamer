@@ -229,13 +229,13 @@ export async function handleBotMessage(
           .first<{ referral_code: string }>();
         if (op) {
           useReferral = true;
-          referralCode = op.referralCode;
+          referralCode = op.referral_code;
         }
       } else {
         for (const op of devStore().operators.values()) {
           if (op.userId === user.id) {
             useReferral = true;
-            referralCode = op.referralCode;
+            referralCode = String(op.referralCode || "");
             break;
           }
         }

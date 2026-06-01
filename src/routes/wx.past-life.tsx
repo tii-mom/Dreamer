@@ -38,6 +38,7 @@ function WxPastLife() {
           r.reason === "missing_chart" ? "请先在微信中发送出生年月日时给戏命师" : "生成失败",
         );
       } else {
+        setError("");
         setResult(r.result as Record<string, unknown>);
       }
     } catch {
@@ -131,9 +132,13 @@ function WxPastLife() {
               「{result.shortText as string}」
             </p>
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(result.shareUrl as string);
-                alert("分享链接已复制！");
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(result.shareUrl as string);
+                  alert("分享链接已复制！");
+                } catch {
+                  alert("复制失败，请手动复制链接");
+                }
               }}
               className="w-full h-12 rounded-xl ritual-btn text-sm font-semibold"
             >

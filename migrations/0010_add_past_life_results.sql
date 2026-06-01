@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS past_life_results (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
   chart_id TEXT,
+  chart_fingerprint TEXT,
   preset_id TEXT NOT NULL,
   title TEXT NOT NULL,
   rarity TEXT NOT NULL,
@@ -16,3 +17,6 @@ CREATE INDEX IF NOT EXISTS idx_past_life_results_user_id ON past_life_results(us
 CREATE INDEX IF NOT EXISTS idx_past_life_results_share_token ON past_life_results(share_token);
 CREATE INDEX IF NOT EXISTS idx_past_life_results_preset_id ON past_life_results(preset_id);
 CREATE INDEX IF NOT EXISTS idx_past_life_results_rarity ON past_life_results(rarity);
+CREATE INDEX IF NOT EXISTS idx_past_life_results_fingerprint ON past_life_results(user_id, chart_fingerprint);
+
+(End of file - total 18 lines)

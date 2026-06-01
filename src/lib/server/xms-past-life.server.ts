@@ -24,6 +24,51 @@ export type PastLifeResult = {
   createdAt: string;
 };
 
+function buildChartFingerprint(chart: ZiweiChart): string {
+  const sihuaList = chart.palaces.flatMap((p) =>
+    p.stars.filter((s) => s.siHua).map((s) => `${s.name}化${s.siHua}`),
+  );
+  return [
+    chart.birthInfo.year,
+    chart.birthInfo.month,
+    chart.birthInfo.day,
+    chart.birthInfo.gender,
+    chart.mingGongBranch,
+    chart.palaces
+      .find((p) => p.name === "命宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    chart.palaces
+      .find((p) => p.name === "财帛宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    chart.palaces
+      .find((p) => p.name === "官禄宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    chart.palaces
+      .find((p) => p.name === "夫妻宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    chart.palaces
+      .find((p) => p.name === "福德宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    chart.palaces
+      .find((p) => p.name === "迁移宫")
+      ?.stars.filter((s) => s.type === "major")
+      .map((s) => s.name)
+      .join(","),
+    sihuaList.join(","),
+    (chart.patterns || []).map((p) => p.name).join(","),
+  ].join("|");
+}
+
 const SI_HUA_WEIGHTS: Record<string, number> = {
   禄: 8,
   权: 8,
@@ -218,12 +263,15 @@ export async function getOrCreatePastLifeResult(
   chartId?: string,
 ): Promise<PastLifeResult> {
   const db = env.DB;
+  const fingerprint = buildChartFingerprint(chart);
 
-  // Check existing
+  // Check existing by user_id AND matching fingerprint
   if (db) {
     const existing = await db
-      .prepare("SELECT * FROM past_life_results WHERE user_id = ? LIMIT 1")
-      .bind(userId)
+      .prepare(
+        "SELECT * FROM past_life_results WHERE user_id = ? AND chart_fingerprint = ? LIMIT 1",
+      )
+      .bind(userId, fingerprint)
       .first<Record<string, string>>();
     if (existing) {
       return {
@@ -273,13 +321,14 @@ export async function getOrCreatePastLifeResult(
     await db
       .prepare(
         `INSERT INTO past_life_results
-        (id, user_id, chart_id, preset_id, title, rarity, result_json, share_token)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, user_id, chart_id, chart_fingerprint, preset_id, title, rarity, result_json, share_token)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         result.id,
         result.userId,
         result.chartId,
+        fingerprint,
         result.preset.id,
         result.title,
         result.rarity,
