@@ -13,7 +13,12 @@ export function fortuneDateKey(date = new Date()) {
 
 export function birthProfileKey(profile: BirthProfile | null | undefined) {
   if (!profile) return "no-birth";
-  return [profile.calendarType, profile.birthDate, profile.birthTime ?? "no-time", profile.gender ?? "unknown"].join(":");
+  return [
+    profile.calendarType,
+    profile.birthDate,
+    profile.birthTime ?? "no-time",
+    profile.gender ?? "unknown",
+  ].join(":");
 }
 
 export function dailyKernelKey(userId: string, dateKey = fortuneDateKey()) {
