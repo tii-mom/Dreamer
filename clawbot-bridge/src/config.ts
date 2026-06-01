@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 export interface BridgeConfig {
   dreamerApiBase: string;
   dreamerBridgeSecret: string;
+  openclawApiBase: string;
   openclaw: {
     botToken: string;
     channelVersion: string;
@@ -15,6 +16,9 @@ export interface BridgeConfig {
     warningBeforeSeconds: number;
     forceReconnectBeforeSeconds: number;
   };
+  admin: {
+    notifyUserId?: string;
+  };
 }
 
 function loadJsonFile(path: string): Record<string, unknown> | null {
@@ -23,6 +27,13 @@ function loadJsonFile(path: string): Record<string, unknown> | null {
   } catch {
     return null;
   }
+}
+
+const I_LINK_API_BASE = "https://ilink.weixin.qq.com"; // fallback only
+
+function randomUin(): string {
+  const u32 = Math.floor(Math.random() * 0xffffffff) >>> 0;
+  return Buffer.from(u32.toString()).toString("base64");
 }
 
 export function loadConfig(): BridgeConfig {
@@ -40,6 +51,11 @@ export function loadConfig(): BridgeConfig {
       local?.dreamerBridgeSecret ||
       defaults?.dreamerBridgeSecret ||
       "",
+    openclawApiBase:
+      process.env["OPENCLAW_API_BASE"] ||
+      local?.openclawApiBase ||
+      defaults?.openclawApiBase ||
+      I_LINK_API_BASE,
     openclaw: {
       botToken:
         process.env["OPENCLAW_BOT_TOKEN"] ||
@@ -76,6 +92,12 @@ export function loadConfig(): BridgeConfig {
         local?.runtime?.forceReconnectBeforeSeconds ||
         defaults?.runtime?.forceReconnectBeforeSeconds ||
         1800,
+    },
+    admin: {
+      notifyUserId:
+        process.env["ADMIN_NOTIFY_USER_ID"] ||
+        local?.admin?.notifyUserId ||
+        defaults?.admin?.notifyUserId,
     },
   };
 }

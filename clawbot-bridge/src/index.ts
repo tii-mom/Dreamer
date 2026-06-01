@@ -29,7 +29,7 @@ async function main() {
     botAgent: config.openclaw.botAgent,
   });
 
-  const clawbot = new OpenClawClient(config.openclaw);
+  const clawbot = new OpenClawClient(config.openclawApiBase, config.openclaw);
   const dreamer = new DreamerClient(config.dreamerApiBase, config.dreamerBridgeSecret);
   const reconnect = new ReconnectManager(config.runtime);
 
@@ -64,8 +64,9 @@ async function main() {
           continue;
         }
 
-        const isTextMessage = typeof msg.content === "string";
-        if (!isTextMessage) {
+        const rawType = Number(msg.rawPayload["message_type"] || msg.rawPayload["type"] || 2);
+        if (rawType !== 2 && rawType !== 1) {
+          logger.info("Non-text message, sending fallback", { type: rawType });
           await clawbot.sendMessage(
             msg.providerUserId,
             "戏命师目前先听文字，图片/语音以后再开。",
