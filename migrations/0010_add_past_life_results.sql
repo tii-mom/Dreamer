@@ -17,6 +17,4 @@ CREATE INDEX IF NOT EXISTS idx_past_life_results_user_id ON past_life_results(us
 CREATE INDEX IF NOT EXISTS idx_past_life_results_share_token ON past_life_results(share_token);
 CREATE INDEX IF NOT EXISTS idx_past_life_results_preset_id ON past_life_results(preset_id);
 CREATE INDEX IF NOT EXISTS idx_past_life_results_rarity ON past_life_results(rarity);
-CREATE INDEX IF NOT EXISTS idx_past_life_results_fingerprint ON past_life_results(user_id, chart_fingerprint);
-
-(End of file - total 18 lines)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_past_life_results_user_fingerprint ON past_life_results(user_id, chart_fingerprint);

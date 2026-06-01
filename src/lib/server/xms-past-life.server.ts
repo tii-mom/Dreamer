@@ -318,24 +318,49 @@ export async function getOrCreatePastLifeResult(
   });
 
   if (db) {
-    await db
-      .prepare(
-        `INSERT INTO past_life_results
-        (id, user_id, chart_id, chart_fingerprint, preset_id, title, rarity, result_json, share_token)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        result.id,
-        result.userId,
-        result.chartId,
-        fingerprint,
-        result.preset.id,
-        result.title,
-        result.rarity,
-        resultJson,
-        result.shareToken,
-      )
-      .run();
+    try {
+      await db
+        .prepare(
+          `INSERT INTO past_life_results
+          (id, user_id, chart_id, chart_fingerprint, preset_id, title, rarity, result_json, share_token)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(
+          result.id,
+          result.userId,
+          result.chartId,
+          fingerprint,
+          result.preset.id,
+          result.title,
+          result.rarity,
+          resultJson,
+          result.shareToken,
+        )
+        .run();
+    } catch {
+      // UNIQUE conflict on (user_id, chart_fingerprint) — re-read the winner
+      const existing = await db
+        .prepare(
+          "SELECT * FROM past_life_results WHERE user_id = ? AND chart_fingerprint = ? LIMIT 1",
+        )
+        .bind(userId, fingerprint)
+        .first<Record<string, string>>();
+      if (existing) {
+        return {
+          id: existing.id,
+          userId: existing.user_id,
+          chartId: existing.chart_id,
+          preset: PAST_LIFE_PRESETS.find((p) => p.id === existing.preset_id)!,
+          title: existing.title,
+          rarity: existing.rarity as PastLifeRarity,
+          camp: PAST_LIFE_PRESETS.find((p) => p.id === existing.preset_id)!.camp,
+          chartReasonShort: JSON.parse(existing.result_json).chartReasonShort || "",
+          shareToken: existing.share_token,
+          createdAt: existing.created_at,
+        };
+      }
+      throw new Error("Failed to insert or read past life result after conflict");
+    }
   } else {
     const store = devStore();
     store.pastLifeResults.set(userId, result as unknown as Record<string, unknown>);

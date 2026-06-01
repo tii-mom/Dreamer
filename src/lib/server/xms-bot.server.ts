@@ -35,7 +35,6 @@ import {
   getOrCreateUserChart,
   isBirthText,
   parseBirthProfileFromText,
-  saveBirthProfileRecord,
   saveOrUpdateUserChart,
 } from "./xms-chart.server";
 
