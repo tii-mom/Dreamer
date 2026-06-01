@@ -65,6 +65,7 @@ export type DevStore = {
   }>;
   birthCharts: Map<string, Record<string, unknown>>;
   botTickets: Map<string, Record<string, unknown>>;
+  botBindTickets: Map<string, Record<string, unknown>>;
 };
 
 export function devStore(): DevStore {
@@ -92,6 +93,7 @@ export function devStore(): DevStore {
       aiLogs: [],
       birthCharts: new Map(),
       botTickets: new Map(),
+      botBindTickets: new Map(),
     };
   }
   return global.__xmsDevStore;
