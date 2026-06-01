@@ -25,10 +25,10 @@ export type PastLifeResult = {
 };
 
 const SI_HUA_WEIGHTS: Record<string, number> = {
-  化禄: 8,
-  化权: 8,
-  化科: 6,
-  化忌: 8,
+  禄: 8,
+  权: 8,
+  科: 6,
+  忌: 8,
 };
 
 const CAMP_STARS: Record<PastLifeCamp, string[]> = {
