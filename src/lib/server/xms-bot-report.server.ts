@@ -21,6 +21,7 @@ export async function createBotHtmlReportReply(input: {
     topic: input.topic,
     context: input.context,
   });
+
   const saved = await createSavedResult(input.env, {
     userId: input.user.id,
     kind: input.kind,
@@ -30,8 +31,10 @@ export async function createBotHtmlReportReply(input: {
     data: { topic: input.topic, context: input.context },
     model: report.model,
   });
+
   const baseUrl = input.env.APP_BASE_URL || "https://bige.life";
   let url = `${baseUrl}/r/${saved.id}`;
+
   try {
     const ticket = await createBotTicket(input.env, {
       userId: input.user.id,
@@ -43,15 +46,16 @@ export async function createBotHtmlReportReply(input: {
   } catch {
     // Report remains readable by direct id; ticket is a convenience for web session binding.
   }
+
   return [
-    `我已把这份天机写成卷宗，微信里太长，看了伤眼。`,
-    ``,
+    "我已把这份天机写成卷宗，微信里太长，看了伤眼。",
+    "",
     `【${input.title}】`,
     report.summary,
-    ``,
-    `打开 HTML 报告：`,
+    "",
+    "打开 HTML 报告：",
     url,
-    ``,
-    `此报告已保存。回「历史」可查看。`,
+    "",
+    "此报告已保存。回「历史」可查看。",
   ].join("\n");
 }
