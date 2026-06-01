@@ -10,6 +10,13 @@ import {
 } from "./lib/server/xms-payment.server";
 import { clawbotWebhookHandler, clawbotIngestHandler } from "./lib/server/xms-bot.server";
 import {
+  handleHermesAgentState,
+  handleHermesDailySummary,
+  handleHermesEntitlementCheck,
+  handleHermesWeixinBind,
+  handleHermesWeixinMessage,
+} from "./lib/server/xms-hermes.server";
+import {
   getPastLifeResultByShareToken,
   buildPastLifeShareSvg,
 } from "./lib/server/xms-past-life.server";
@@ -58,6 +65,26 @@ export default {
 
       if (url.pathname === "/api/bot/clawbot/ingest" && request.method === "POST") {
         return clawbotIngestHandler(request, env);
+      }
+
+      if (url.pathname === "/api/hermes/weixin/bind") {
+        return handleHermesWeixinBind(request, env);
+      }
+
+      if (url.pathname === "/api/hermes/weixin/message") {
+        return handleHermesWeixinMessage(request, env);
+      }
+
+      if (url.pathname === "/api/hermes/agent-state") {
+        return handleHermesAgentState(request, env);
+      }
+
+      if (url.pathname === "/api/hermes/entitlement-check") {
+        return handleHermesEntitlementCheck(request, env);
+      }
+
+      if (url.pathname === "/api/hermes/daily-summary") {
+        return handleHermesDailySummary(request, env);
       }
 
       if (url.pathname === "/api/pay/callback" && request.method === "POST") {
