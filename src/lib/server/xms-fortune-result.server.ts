@@ -14,6 +14,16 @@ export type FortuneResultView = {
   createdAt: string;
 };
 
+type FortuneResultGlobal = typeof globalThis & {
+  __xmsFortuneResults?: Map<string, FortuneResultView>;
+};
+
+function localResults() {
+  const global = globalThis as FortuneResultGlobal;
+  if (!global.__xmsFortuneResults) global.__xmsFortuneResults = new Map();
+  return global.__xmsFortuneResults;
+}
+
 export function mapFortuneResultRow(row: Record<string, unknown>): FortuneResultView {
   return {
     id: String(row.id),
@@ -46,16 +56,24 @@ export async function createSavedResult(env: CloudflareBindings, input: {
   const html = input.html ? sanitizeReportHtml(input.html) : null;
   const dataJson = JSON.stringify(input.data ?? {});
   const shareToken = makeShareToken(id);
-  if (env.DB) {
-    await env.DB.prepare("INSERT INTO fortune_results (id,user_id,kind,title,summary,html,data_json,share_token,model,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-      .bind(id, input.userId, input.kind, input.title, input.summary, html, dataJson, shareToken, input.model ?? null, now, now)
-      .run();
+  const result = { id, userId: input.userId, kind: input.kind, title: input.title, summary: input.summary, html, dataJson, shareToken, createdAt: now } satisfies FortuneResultView;
+  if (!env.DB) {
+    localResults().set(id, result);
+    return result;
   }
-  return { id, userId: input.userId, kind: input.kind, title: input.title, summary: input.summary, html, dataJson, shareToken, createdAt: now } satisfies FortuneResultView;
+  await env.DB.prepare("INSERT INTO fortune_results (id,user_id,kind,title,summary,html,data_json,share_token,model,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+    .bind(id, input.userId, input.kind, input.title, input.summary, html, dataJson, shareToken, input.model ?? null, now, now)
+    .run();
+  return result;
 }
 
 export async function listSavedResults(env: CloudflareBindings, userId: string) {
-  if (!env.DB) return [];
+  if (!env.DB) {
+    return Array.from(localResults().values())
+      .filter((item) => item.userId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, 50);
+  }
   const rows = await env.DB.prepare("SELECT * FROM fortune_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 50")
     .bind(userId)
     .all<Record<string, unknown>>();
@@ -63,7 +81,7 @@ export async function listSavedResults(env: CloudflareBindings, userId: string) 
 }
 
 export async function readSavedResult(env: CloudflareBindings, id: string) {
-  if (!env.DB) return null;
+  if (!env.DB) return localResults().get(id) ?? null;
   const row = await env.DB.prepare("SELECT * FROM fortune_results WHERE id = ?")
     .bind(id)
     .first<Record<string, unknown>>();
@@ -71,7 +89,9 @@ export async function readSavedResult(env: CloudflareBindings, id: string) {
 }
 
 export async function readSharedResult(env: CloudflareBindings, token: string) {
-  if (!env.DB) return null;
+  if (!env.DB) {
+    return Array.from(localResults().values()).find((item) => item.shareToken === token) ?? null;
+  }
   const row = await env.DB.prepare("SELECT * FROM fortune_results WHERE share_token = ?")
     .bind(token)
     .first<Record<string, unknown>>();
