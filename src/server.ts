@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { wrapReportHtml, renderFallbackReport, escapeHtml } from "./lib/fortune/report-html";
 import { logEvent } from "./lib/server/xms-store.server";
 import {
   handleBufPayCallback,
@@ -13,6 +14,7 @@ import {
   getPastLifeResultByShareToken,
   buildPastLifeShareSvg,
 } from "./lib/server/xms-past-life.server";
+import { readSavedResult, readSharedResult } from "./lib/server/xms-fortune-result.server";
 
 type ServerEntry = {
   fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
@@ -78,6 +80,14 @@ export default {
 
       if (url.pathname.startsWith("/api/share/past-life-card/") && url.pathname.endsWith(".svg")) {
         return servePastLifeSvg(request, env);
+      }
+
+      if (url.pathname.startsWith("/r/")) {
+        return serveFortuneReport(request, env);
+      }
+
+      if (url.pathname.startsWith("/share/result/")) {
+        return serveSharedFortuneReport(request, env);
       }
 
       const handler = await getServerEntry();
@@ -149,5 +159,29 @@ async function servePastLifeSvg(request: Request, env: CloudflareBindings) {
       "Content-Type": "image/svg+xml; charset=utf-8",
       "Cache-Control": "public, max-age=3600",
     },
+  });
+}
+
+async function serveFortuneReport(request: Request, env: CloudflareBindings) {
+  const url = new URL(request.url);
+  const id = decodeURIComponent(url.pathname.replace("/r/", ""));
+  if (!id) return new Response("Not found", { status: 404 });
+  const result = await readSavedResult(env, id);
+  if (!result) return new Response("Not found", { status: 404 });
+  const html = result.html || renderFallbackReport({ title: result.title, summary: result.summary });
+  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+async function serveSharedFortuneReport(request: Request, env: CloudflareBindings) {
+  const url = new URL(request.url);
+  const token = decodeURIComponent(url.pathname.replace("/share/result/", ""));
+  if (!token) return new Response("Not found", { status: 404 });
+  const result = await readSharedResult(env, token);
+  if (!result) return new Response("Not found", { status: 404 });
+  const html = `<article class="xms-report"><h1>${escapeHtml(result.title)}</h1><section><h2>摘要</h2><p>${escapeHtml(result.summary)}</p></section></article>`;
+  return new Response(wrapReportHtml({ title: result.title, html, createdAt: result.createdAt }), {
+    headers: { "content-type": "text/html; charset=utf-8" },
   });
 }
