@@ -76,7 +76,8 @@ export async function maybeClawbotReportIngestHandler(
 
   const birth = await getBirthProfile(env, user.id);
   const chart = birth ? await getOrCreateUserChart(env, user.id, birth) : null;
-  const context = chart?.promptSummary || "No complete chart yet. Ask the user for full birth date and time.";
+  const context =
+    chart?.promptSummary || "No complete chart yet. Ask the user for full birth date and time.";
   const reply = await createBotHtmlReportReply({
     env,
     user,
