@@ -32,7 +32,7 @@ export class ReconnectManager {
   }
 
   check(): void {
-    const elapsed = (this.startTime - Date.now()) / 1000;
+    const elapsed = (Date.now() - this.startTime) / 1000;
     const remaining = this.config.sessionDurationSeconds - elapsed;
 
     const h3Limit = 3 * 3600;
