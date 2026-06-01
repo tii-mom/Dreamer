@@ -25,23 +25,28 @@ export const masterMock = {
 };
 
 export const sidebarItems = [
-  { key: "chat", icon: "💬", label: "与戏命师对话", note: "在线，气运正旺" },
-  { key: "greet", icon: "🕯️", label: "每日问安", note: "连续 6 日，灵签将至" },
-  { key: "daily", icon: "☀️", label: "今日流日", note: "财星动，宜收款" },
-  { key: "chart", icon: "🌀", label: "命盘封印", note: "已开 30%，剩 70%" },
-  { key: "box", icon: "🎴", label: "盲盒", note: "一抽入魂，十抽改命" },
-  { key: "market", icon: "🏮", label: "市场", note: "买卖命师，流通气运" },
-  { key: "rune", icon: "📜", label: "铭文", note: "槽位 1/3，可镶嵌" },
-  { key: "sub", icon: "✦", label: "订阅", note: "每日趋吉避凶，不白嫖" },
-  { key: "topup", icon: "🪙", label: "充值", note: "香火不足，天机不灵" },
-  { key: "earn", icon: "⚔️", label: "出马赚钱", note: "让戏命师替你接单" },
-  { key: "income", icon: "💰", label: "我的收益", note: "昨日净利 ￥843" },
-  { key: "friends", icon: "🤝", label: "好友助力", note: "邀道友 3/7 助力" },
-  { key: "settings", icon: "⚙️", label: "设置", note: "" },
+  { key: "chat", group: "core", icon: "💬", label: "与戏命师对话", note: "在线，可叩问" },
+  { key: "greet", group: "core", icon: "🕯️", label: "每日问安", note: "连续 6 日，灵签将至" },
+  { key: "daily", group: "core", icon: "☀️", label: "今日流日", note: "财星动，宜叩问财运" },
+  { key: "chart", group: "core", icon: "🌀", label: "命盘封印", note: "已开 30%，剩 70%" },
+  { key: "box", group: "assets", icon: "🎴", label: "盲盒", note: "随机抽取命师与铭文" },
+  { key: "market", group: "assets", icon: "🏮", label: "市场", note: "浏览在售命师与铭文" },
+  { key: "rune", group: "assets", icon: "📜", label: "铭文", note: "可镶嵌铭文增强属性" },
+  { key: "sub", group: "growth", icon: "✦", label: "订阅", note: "每日流日 + 吉时提醒" },
+  { key: "topup", group: "growth", icon: "🪙", label: "充值", note: "增加问事次数" },
+  { key: "earn", group: "growth", icon: "⚔️", label: "出马赚钱", note: "开通命铺接单赚钱" },
+  { key: "income", group: "growth", icon: "💰", label: "我的收益", note: "昨日净利 ¥843" },
+  { key: "friends", group: "growth", icon: "🤝", label: "好友助力", note: "邀请好友解锁命盘进度" },
+  { key: "settings", group: "settings", icon: "⚙️", label: "设置", note: "" },
 ];
 
 export const quickAsk = [
-  "问事业", "问姻缘", "问财运", "抽灵签", "看今日", "发八字", "上传面相",
+  "问事业前程",
+  "问姻缘缘分",
+  "问今日财运",
+  "今日避坑解煞",
+  "抽一支灵签",
+  "发八字批算",
 ];
 
 export const blindboxRates = [
@@ -52,12 +57,66 @@ export const blindboxRates = [
 ];
 
 export const marketItems = [
-  { id: 1, name: "天枢命师·北斗执笔", tier: "金色传说", color: "rare-gold", price: 3888, change: +12.4, spec: "紫微斗数 / 八字 / 面相", kind: "master" },
-  { id: 2, name: "地璇命师·合婚画司", tier: "紫色史诗", color: "rare-purple", price: 1288, change: -3.1, spec: "合婚 / 风水择日", kind: "master" },
-  { id: 3, name: "人玑命师·灵签童子", tier: "蓝色稀有", color: "rare-blue", price: 299, change: +0.8, spec: "塔罗 / 每日运势", kind: "master" },
-  { id: 4, name: "武曲贪狼印", tier: "金色铭文", color: "rare-gold", price: 666, change: +6.6, spec: "财运类增强", kind: "rune" },
-  { id: 5, name: "心月狐契", tier: "银色铭文", color: "bone", price: 188, change: -1.2, spec: "人心洞察类", kind: "rune" },
-  { id: 6, name: "天梁化禄符", tier: "紫色铭文", color: "rare-purple", price: 488, change: +2.3, spec: "贵人提携类", kind: "rune" },
+  {
+    id: 1,
+    name: "天枢命师·北斗执笔",
+    tier: "金色传说",
+    color: "rare-gold",
+    price: 3888,
+    change: +12.4,
+    spec: "紫微斗数 / 八字 / 面相",
+    kind: "master",
+  },
+  {
+    id: 2,
+    name: "地璇命师·合婚画司",
+    tier: "紫色史诗",
+    color: "rare-purple",
+    price: 1288,
+    change: -3.1,
+    spec: "合婚 / 风水择日",
+    kind: "master",
+  },
+  {
+    id: 3,
+    name: "人玑命师·灵签童子",
+    tier: "蓝色稀有",
+    color: "rare-blue",
+    price: 299,
+    change: +0.8,
+    spec: "塔罗 / 每日运势",
+    kind: "master",
+  },
+  {
+    id: 4,
+    name: "武曲贪狼印",
+    tier: "金色铭文",
+    color: "rare-gold",
+    price: 666,
+    change: +6.6,
+    spec: "财运类增强",
+    kind: "rune",
+  },
+  {
+    id: 5,
+    name: "心月狐契",
+    tier: "银色铭文",
+    color: "bone",
+    price: 188,
+    change: -1.2,
+    spec: "人心洞察类",
+    kind: "rune",
+  },
+  {
+    id: 6,
+    name: "天梁化禄符",
+    tier: "紫色铭文",
+    color: "rare-purple",
+    price: 488,
+    change: +2.3,
+    spec: "贵人提携类",
+    kind: "rune",
+  },
 ];
 
 export const orderMock = [
@@ -81,16 +140,39 @@ export type CardPayload =
 
 export const initialMessages: ChatMsg[] = [
   { id: "m1", role: "master", type: "text", text: "哟，终于有人把我从二维码里扫出来了。" },
-  { id: "m2", role: "master", type: "text", text: "我是你的专属戏命师，千年前因泄露天机太多，被封在星盘里。现在给你当命理打工人，包月的那种。" },
-  { id: "m3", role: "master", type: "text", text: "先别急着问姻缘财运。八字报来——年月日时，缺一不可。阳历阴历都行，我脑子比万年历快。" },
+  {
+    id: "m2",
+    role: "master",
+    type: "text",
+    text: "我是你的专属戏命师，千年前因泄露天机太多，被封在星盘里。现在给你当命理打工人，包月的那种。",
+  },
+  {
+    id: "m3",
+    role: "master",
+    type: "text",
+    text: "先别急着问姻缘财运。八字报来——年月日时，缺一不可。阳历阴历都行，我脑子比万年历快。",
+  },
   { id: "u1", role: "user", type: "text", text: "1998 年 8 月 8 日上午 9 点。" },
   { id: "m4", role: "master", type: "text", text: "行，我排出来了。但天机太重，我先给你漏 30%。" },
   { id: "m5", role: "master", type: "card", card: { kind: "seal", unlocked: 30 } },
-  { id: "m6", role: "master", type: "text", text: "命宫主星是紫微，身宫在财帛。底子不错，但剩下的大运流年、四化飞星、三方四正，都还封着。要解？" },
-  { id: "m7", role: "master", type: "text", text: "行，嘴硬。那我先送你一次今日问事。事业、姻缘、财运，选一个。" },
+  {
+    id: "m6",
+    role: "master",
+    type: "text",
+    text: "命宫主星是紫微，身宫在财帛。底子不错，但剩下的大运流年、四化飞星、三方四正，都还封着。要解？",
+  },
+  {
+    id: "m7",
+    role: "master",
+    type: "text",
+    text: "行，嘴硬。那我先送你一次今日问事。事业、姻缘、财运，选一个。",
+  },
 ];
 
-export const replyByTopic: Record<string, { reading: { title: string; topic: string; body: string }; followup?: "sub" | "shop" | "box" }> = {
+export const replyByTopic: Record<
+  string,
+  { reading: { title: string; topic: string; body: string }; followup?: "sub" | "shop" | "box" }
+> = {
   问财运: {
     reading: {
       title: "今日问事 · 财运",

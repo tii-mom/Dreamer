@@ -1,0 +1,75 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "xms-dialogue-game",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "bige.life",
+      "custom_domain": true,
+    },
+    {
+      "pattern": "www.bige.life",
+      "custom_domain": true,
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+  },
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+  },
+  "vars": {
+    "APP_BASE_URL": "https://bige.life",
+    "CF_ACCOUNT_ID": "ff431aed46e94b0593b8b1ee48842c7a",
+    "CF_AI_GATEWAY_ID": "xms-dialogue-game",
+    "DEEPSEEK_CHAT_MODEL": "deepseek-v4-flash",
+    "DEEPSEEK_REPORT_MODEL": "deepseek-v4-pro",
+    "VAPID_PUBLIC_KEY": "",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "xms-dialogue-game",
+      "database_id": "897b9ea6-d185-462c-ae29-cc53d9289472",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION_KV",
+      "id": "e418ece245214048b522521a3ee1e73e",
+      "preview_id": "ca32c297a4ca44c2bc851c717496dc64",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ASSETS_BUCKET",
+      "bucket_name": "xms-dialogue-game-assets",
+    },
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "AI_QUEUE",
+        "queue": "xms-dialogue-game-ai",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "xms-dialogue-game-ai",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+      },
+    ],
+  },
+  "triggers": {
+    "crons": ["0 23 * * *", "0 15 * * *"],
+  },
+}

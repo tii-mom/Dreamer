@@ -2,9 +2,10 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { logEvent } from "./lib/server/xms-store.server";
 
 type ServerEntry = {
-  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
+  fetch: (request: Request, opts?: unknown) => Promise<Response> | Response;
 };
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
@@ -38,10 +39,19 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request, env: CloudflareBindings = {}, ctx?: ExecutionContext) {
     try {
+      const url = new URL(request.url);
+      if (url.pathname.startsWith("/api/assets/")) {
+        return serveR2Asset(request, env);
+      }
+
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
+      const response = await handler.fetch(request, {
+        context: {
+          cloudflare: { env, ctx },
+        },
+      });
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
@@ -51,4 +61,36 @@ export default {
       });
     }
   },
+
+  async queue(batch: MessageBatch<AiQueueMessage>, env: CloudflareBindings) {
+    for (const message of batch.messages) {
+      await logEvent(
+        env,
+        null,
+        "queue_message_seen",
+        message.body as unknown as Record<string, unknown>,
+      );
+      message.ack();
+    }
+  },
+
+  async scheduled(controller: ScheduledController, env: CloudflareBindings) {
+    await logEvent(env, null, "cron_triggered", {
+      cron: controller.cron,
+      scheduledTime: controller.scheduledTime,
+    });
+  },
 };
+
+async function serveR2Asset(request: Request, env: CloudflareBindings) {
+  if (!env.ASSETS_BUCKET) return new Response("R2 is not configured", { status: 404 });
+  const url = new URL(request.url);
+  const key = decodeURIComponent(url.pathname.replace("/api/assets/", ""));
+  const object = await env.ASSETS_BUCKET.get(key);
+  if (!object) return new Response("Not found", { status: 404 });
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("etag", object.httpEtag);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+  return new Response(object.body, { headers });
+}

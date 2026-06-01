@@ -7,7 +7,9 @@ export function MasterAvatar({ size = 64, breath = true }: { size?: number; brea
       {/* glow ring */}
       <div
         className="absolute inset-0 rounded-full blur-xl opacity-60"
-        style={{ background: "radial-gradient(circle, oklch(0.6 0.25 305 / 0.7), transparent 70%)" }}
+        style={{
+          background: "radial-gradient(circle, oklch(0.6 0.25 305 / 0.7), transparent 70%)",
+        }}
       />
       {/* rotating compass ring */}
       <div className="absolute inset-0 animate-spin-slow opacity-50">
@@ -17,7 +19,9 @@ export function MasterAvatar({ size = 64, breath = true }: { size?: number; brea
       <motion.img
         src={masterImg}
         alt="戏命师 命由天瞳"
-        className={breath ? "animate-breath relative z-10 object-contain" : "relative z-10 object-contain"}
+        className={
+          breath ? "animate-breath relative z-10 object-contain" : "relative z-10 object-contain"
+        }
         style={{ width: size, height: size }}
         draggable={false}
       />

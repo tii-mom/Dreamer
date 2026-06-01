@@ -1,5 +1,6 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatWindow } from "@/components/ChatWindow";
@@ -14,14 +15,24 @@ import {
   GreetModal,
   SealModal,
 } from "@/components/Modals";
-import { initialMessages, userMock, type ChatMsg } from "@/lib/mock-data";
+import {
+  applyEarnAccess,
+  checkInDaily,
+  ensureSession,
+  generateShareCard,
+  sendMessage,
+} from "@/lib/api/xms.functions";
+import type { AppBootstrap, ChatMsg, ShareAsset } from "@/lib/domain";
 import type { ModalKey } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "戏命师 · 执笔写命，嘲讽人生剧本" },
-      { name: "description", content: "你的好友列表里，住着一个会算命、会怼人、还能帮你赚钱的 AI 戏命师。" },
+      {
+        name: "description",
+        content: "你的好友列表里，住着一个会算命、会怼人、还能帮你赚钱的 AI 戏命师。",
+      },
       { property: "og:title", content: "戏命师" },
       { property: "og:description", content: "AI 命师机器人 · 命理交易市场 · 盲盒养成 · 出马赚钱" },
     ],
@@ -30,28 +41,108 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const queryClient = useQueryClient();
   const [modal, setModal] = useState<ModalKey | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMsg[]>(initialMessages);
-  const [sealUnlocked, setSealUnlocked] = useState(30);
+  const [optimisticMessages, setOptimisticMessages] = useState<ChatMsg[]>([]);
+  const [latestShare, setLatestShare] = useState<ShareAsset | null>(null);
+
+  const bootstrapQuery = useQuery({
+    queryKey: ["xms-bootstrap"],
+    queryFn: () => ensureSession(),
+  });
+
+  const bootstrap = bootstrapQuery.data as AppBootstrap | undefined;
+  const user = bootstrap?.user ?? null;
+  const daily = bootstrap?.daily ?? null;
+  const messages = useMemo(
+    () => [...(bootstrap?.messages ?? []), ...optimisticMessages],
+    [bootstrap?.messages, optimisticMessages],
+  );
+
+  const sendMutation = useMutation({
+    mutationFn: (text: string) => {
+      if (!bootstrap?.threadId) throw new Error("会话还没准备好");
+      return sendMessage({ data: { threadId: bootstrap.threadId, text } });
+    },
+    onMutate: (text) => {
+      const optimistic: ChatMsg = {
+        id: `pending_${Date.now()}`,
+        role: "user",
+        type: "text",
+        text,
+        createdAt: new Date().toISOString(),
+      };
+      setOptimisticMessages((current) => [...current, optimistic]);
+    },
+    onSuccess: () => {
+      setOptimisticMessages([]);
+      queryClient.invalidateQueries({ queryKey: ["xms-bootstrap"] });
+    },
+    onError: (error) => {
+      setOptimisticMessages((current) => [
+        ...current,
+        {
+          id: `err_${Date.now()}`,
+          role: "master",
+          type: "text",
+          text: error instanceof Error ? `推演卡住了：${error.message}` : "推演卡住了，稍后再叩。",
+        },
+      ]);
+    },
+  });
+
+  const checkInMutation = useMutation({
+    mutationFn: () => checkInDaily(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["xms-bootstrap"] });
+    },
+  });
+
+  const shareMutation = useMutation({
+    mutationFn: (kind: "seal" | "daily" | "earn") => generateShareCard({ data: { kind } }),
+    onSuccess: (asset) => {
+      setLatestShare(asset);
+      queryClient.invalidateQueries({ queryKey: ["xms-bootstrap"] });
+    },
+  });
+
+  const earnMutation = useMutation({
+    mutationFn: (input: { offer: string; audience: string; priceRange: string }) =>
+      applyEarnAccess({ data: input }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["xms-bootstrap"] });
+    },
+  });
 
   function unlockSeal() {
     setModal("seal");
   }
 
   function onPaidSeal() {
-    setSealUnlocked(100);
-    setMessages((m) => [
-      ...m,
-      { id: crypto.randomUUID(), role: "master", type: "text", text: "符纸已焚，封印解。整张命盘交付给你，看不看得懂随你。" },
-      { id: crypto.randomUUID(), role: "master", type: "card", card: { kind: "seal", unlocked: 100 } },
+    setOptimisticMessages((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        role: "master",
+        type: "text",
+        text: "首版暂不收款。封印先给你模拟解开，真付费等运营验证后再接。",
+      },
+      {
+        id: crypto.randomUUID(),
+        role: "master",
+        type: "card",
+        card: { kind: "seal", unlocked: 100 },
+      },
     ]);
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar
-        user={userMock}
+        user={
+          user ?? { level: "见习命师", asksToday: 0, asksMax: 1, qiyun: 0, wallet: 0, unread: 0 }
+        }
         onOpen={setModal}
         onToggleSidebar={() => setSidebarOpen((s) => !s)}
       />
@@ -60,29 +151,53 @@ function Index() {
         <Sidebar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          onOpenModal={(k) => setModal(k)}
+          onOpenModal={(k) => {
+            if (k === "greet") checkInMutation.mutate();
+            setModal(k);
+          }}
         />
 
         <main className="flex-1 flex min-w-0">
           <ChatWindow
             messages={messages}
-            setMessages={setMessages}
             onOpenModal={(k) => setModal(k)}
-            sealUnlocked={sealUnlocked}
+            sealUnlocked={user?.sealUnlocked ?? 30}
             onUnlockSeal={unlockSeal}
+            onSendMessage={(text) => sendMutation.mutate(text)}
+            isSending={sendMutation.isPending}
+            isReady={!!bootstrap?.threadId && !bootstrapQuery.isError && !bootstrapQuery.isLoading}
+            isBootstrapError={bootstrapQuery.isError}
+            daily={daily}
+            user={user}
           />
           <RightPanel onOpenModal={(k) => setModal(k)} />
         </main>
       </div>
 
-      {/* Modals */}
       <TopupModal open={modal === "topup"} onClose={() => setModal(null)} />
       <SubModal open={modal === "sub"} onClose={() => setModal(null)} />
       <BoxModal open={modal === "box"} onClose={() => setModal(null)} />
       <MarketDrawer open={modal === "market"} onClose={() => setModal(null)} />
-      <EarnDrawer open={modal === "earn"} onClose={() => setModal(null)} />
-      <ShareModal open={modal === "share"} onClose={() => setModal(null)} />
-      <GreetModal open={modal === "greet"} onClose={() => setModal(null)} streak={7} />
+      <EarnDrawer
+        open={modal === "earn"}
+        onClose={() => setModal(null)}
+        onApply={(input) => earnMutation.mutate(input)}
+        isApplying={earnMutation.isPending}
+        application={bootstrap?.earnApplication ?? null}
+      />
+      <ShareModal
+        open={modal === "share"}
+        onClose={() => setModal(null)}
+        shareAsset={latestShare ?? bootstrap?.shareAsset ?? null}
+        onGenerate={(kind) => shareMutation.mutate(kind)}
+        isGenerating={shareMutation.isPending}
+      />
+      <GreetModal
+        open={modal === "greet"}
+        onClose={() => setModal(null)}
+        streak={user?.streak ?? 0}
+        alreadyChecked={checkInMutation.data?.alreadyChecked ?? daily?.checkedIn ?? false}
+      />
       <SealModal open={modal === "seal"} onClose={() => setModal(null)} onPaid={onPaidSeal} />
     </div>
   );

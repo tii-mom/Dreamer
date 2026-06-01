@@ -77,24 +77,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "An AI fortune teller chatbot that offers personalized readings, market trading, and gamified experiences." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "An AI fortune teller chatbot that offers personalized readings, market trading, and gamified experiences." },
+      { title: "戏命师 · AI 命理机器人" },
+      {
+        name: "description",
+        content: "一个会算命、会怼人、还能帮你设计赚钱服务菜单的 AI 戏命师。",
+      },
+      { name: "author", content: "戏命师" },
+      { name: "theme-color", content: "#21102f" },
+      { property: "og:title", content: "戏命师" },
+      {
+        property: "og:description",
+        content: "Web 内 AI 戏命师 · 每日流日 · 出马赚钱候补 · 分享裂变",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "An AI fortune teller chatbot that offers personalized readings, market trading, and gamified experiences." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/119a06e9-b982-4717-85a3-9d67215e9675/id-preview-f3d79f8e--20949156-eba3-4222-bb20-501ad514adf9.lovable.app-1780254324016.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/119a06e9-b982-4717-85a3-9d67215e9675/id-preview-f3d79f8e--20949156-eba3-4222-bb20-501ad514adf9.lovable.app-1780254324016.png" },
+      { name: "twitter:title", content: "戏命师" },
+      {
+        name: "twitter:description",
+        content: "你的好友列表里，住着一个会算命、会怼人、还能帮你赚钱的 AI 戏命师。",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/icon.svg" },
     ],
   }),
   shellComponent: RootShell,
@@ -111,6 +120,12 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));",
+          }}
+        />
         <Scripts />
       </body>
     </html>
