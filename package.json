@@ -4,7 +4,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/patch-launch-blockers.mjs",
     "dev": "vite dev",
+    "prebuild": "node scripts/patch-launch-blockers.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
@@ -18,6 +20,7 @@
     "art:manifest": "node scripts/generate-asset-manifest.mjs",
     "art:upload": "node scripts/upload-art-assets.mjs",
     "art:verify": "node scripts/verify-art-assets.mjs",
+    "prelint": "node scripts/patch-launch-blockers.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
