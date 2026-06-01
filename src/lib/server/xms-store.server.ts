@@ -725,6 +725,8 @@ function mapPayment(row: Record<string, unknown>): PaymentRecord {
     payPriceCents: row.pay_price_cents ? Number(row.pay_price_cents) : null,
     status: String(row.status) as PaymentStatus,
     entitlementApplied: toBool(row.entitlement_applied),
+    referralCode: row.referral_code ? String(row.referral_code) : null,
+    operatorUserId: row.operator_user_id ? String(row.operator_user_id) : null,
     qr: row.qr ? String(row.qr) : null,
     qrImg: row.qr_img ? String(row.qr_img) : null,
     qrPrice: row.qr_price ? String(row.qr_price) : null,
