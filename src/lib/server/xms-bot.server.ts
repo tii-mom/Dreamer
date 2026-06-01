@@ -2,6 +2,7 @@ import {
   getBindingByProviderUser,
   createWechatBinding,
   verifyClawbotSignature,
+  verifyBridgeSignature,
 } from "./xms-wechat.server";
 import {
   getUser,
@@ -473,4 +474,67 @@ export async function clawbotWebhookHandler(
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+export async function clawbotIngestHandler(
+  request: Request,
+  env: CloudflareBindings,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, error: "Method Not Allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  let bodyText = "";
+  let body: { provider?: string; providerUserId?: string; content?: string; rawPayload?: unknown };
+  try {
+    bodyText = await request.clone().text();
+    body = JSON.parse(bodyText);
+  } catch {
+    return new Response(JSON.stringify({ ok: false, error: "Invalid JSON" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (!verifyBridgeSignature(request, env, bodyText)) {
+    return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const provider = body.provider;
+  const providerUserId = body.providerUserId;
+  const content = body.content;
+
+  if (provider !== "clawbot") {
+    return new Response(JSON.stringify({ ok: false, error: "Invalid provider" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (!providerUserId || !content) {
+    return new Response(JSON.stringify({ ok: false, error: "Missing providerUserId or content" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const reply = await handleBotMessage(env, providerUserId, content, body.rawPayload ?? {});
+    return new Response(JSON.stringify({ ok: true, reply }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("[Ingest] Error:", err);
+    return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }

@@ -215,3 +215,59 @@ export function verifyClawbotSignature(
 
   return true;
 }
+
+/**
+ * Verify Bridge-to-Dreamer HMAC signature
+ *
+ * Headers:
+ *   x-dreamer-bridge-timestamp
+ *   x-dreamer-bridge-nonce
+ *   x-dreamer-bridge-signature
+ *
+ * Signature: HMAC-SHA256(timestamp + "." + nonce + "." + rawBody, DREAMER_BRIDGE_SECRET)
+ */
+export function verifyBridgeSignature(
+  request: Request,
+  env: CloudflareBindings,
+  bodyText: string,
+): boolean {
+  const secret = env.DREAMER_BRIDGE_SECRET;
+  if (!secret) {
+    console.error("[Bridge] DREAMER_BRIDGE_SECRET not configured");
+    return false;
+  }
+
+  const timestamp = request.headers.get("x-dreamer-bridge-timestamp");
+  const nonce = request.headers.get("x-dreamer-bridge-nonce");
+  const signature = request.headers.get("x-dreamer-bridge-signature");
+
+  if (!timestamp || !nonce || !signature) {
+    console.error("[Bridge] Missing signature headers");
+    return false;
+  }
+
+  const ts = parseInt(timestamp, 10);
+  if (isNaN(ts)) return false;
+
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - ts) > 300) {
+    console.error("[Bridge] Timestamp expired:", ts, "now:", now);
+    return false;
+  }
+
+  const payload = `${timestamp}.${nonce}.${bodyText}`;
+  const expected = createHmac("sha256", secret).update(payload, "utf-8").digest("hex");
+
+  if (signature.length !== expected.length) return false;
+  let match = 0;
+  for (let i = 0; i < signature.length; i++) {
+    match |= signature.charCodeAt(i) ^ expected.charCodeAt(i);
+  }
+
+  if (match !== 0) {
+    console.error("[Bridge] Signature mismatch");
+    return false;
+  }
+
+  return true;
+}

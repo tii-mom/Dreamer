@@ -1,0 +1,20 @@
+{
+  "dreamerApiBase": "https://bige.life",
+  "dreamerBridgeSecret": "replace-with-secret",
+  "openclawApiBase": "https://ilink.weixin.qq.com",
+  "openclaw": {
+    "botToken": "",
+    "channelVersion": "2.4.3",
+    "clientVersion": "2.4.3",
+    "botAgent": "xms-clawbot-bridge/0.1.0"
+  },
+  "runtime": {
+    "pollTimeoutSeconds": 35,
+    "sessionDurationSeconds": 86400,
+    "warningBeforeSeconds": 7200,
+    "forceReconnectBeforeSeconds": 1800
+  },
+  "admin": {
+    "notifyUserId": ""
+  }
+}
