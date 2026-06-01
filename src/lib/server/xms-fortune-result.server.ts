@@ -110,7 +110,9 @@ export async function listSavedResults(env: CloudflareBindings, userId: string) 
   }
 
   const rows = await env.DB
-    .prepare("SELECT * FROM fortune_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 50")
+    .prepare(
+      "SELECT * FROM fortune_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 50",
+    )
     .bind(userId)
     .all<Record<string, unknown>>();
   return (rows.results ?? []).map(mapFortuneResultRow);
@@ -119,8 +121,7 @@ export async function listSavedResults(env: CloudflareBindings, userId: string) 
 export async function readSavedResult(env: CloudflareBindings, id: string) {
   if (!env.DB) return localResults().get(id) ?? null;
 
-  const row = await env.DB
-    .prepare("SELECT * FROM fortune_results WHERE id = ?")
+  const row = await env.DB.prepare("SELECT * FROM fortune_results WHERE id = ?")
     .bind(id)
     .first<Record<string, unknown>>();
   return row ? mapFortuneResultRow(row) : null;
@@ -131,8 +132,7 @@ export async function readSharedResult(env: CloudflareBindings, token: string) {
     return Array.from(localResults().values()).find((item) => item.shareToken === token) ?? null;
   }
 
-  const row = await env.DB
-    .prepare("SELECT * FROM fortune_results WHERE share_token = ?")
+  const row = await env.DB.prepare("SELECT * FROM fortune_results WHERE share_token = ?")
     .bind(token)
     .first<Record<string, unknown>>();
   return row ? mapFortuneResultRow(row) : null;
